@@ -14,6 +14,8 @@ def getCryptocurrencyInfo(symbol):
     #print(url)
 
     CRYPTO_KR_NAME = getNameFromCryptoSymbol(symbol)
+    CRYPTO_PICTURE_URL = getCryptocurrencyURL(symbol)
+    
     if CRYPTO_KR_NAME == 404:        # 항목 없음 에러 코드
         print("Unavailable Cryptocurrency Request")
         _END_TIME = time.time()
@@ -21,6 +23,10 @@ def getCryptocurrencyInfo(symbol):
         print("작동 시간 : " + str(_RUNNING_TIME) + " 초")
         
         return 404                              # 함수 종료
+
+    if CRYPTO_PICTURE_URL == 404:
+        print("No picture :: Picture will be skipped")
+        CRYPTO_PICTURE_URL = 404
 
     try:
         response = requests.get(url, timeout=0.9)
@@ -65,6 +71,23 @@ def getCryptocurrencyInfo(symbol):
         CURRENT_CRYPTO_KRW_CHANGE_24h = cryptocurrencyInfoSet["data"]["fluctate_24H"]               # 최근 24시간 변동량(KRW)
         CURRENT_CRYPTO_KRW_CHANGE_24h = "{:,}".format(float(CURRENT_CRYPTO_KRW_CHANGE_24h)).replace('.0','') + " 원"
         CURRENT_CRYPTO_PERCENT_CHANGE_24h = cryptocurrencyInfoSet["data"]["fluctate_rate_24H"]      # 최근 24시간 변동량(Percent)
+
+        # 아기자기한 효과) 변동량에 따라서 디스코드에 이모지를 출력해 보자!
+        if 30 >= float(CURRENT_CRYPTO_PERCENT_CHANGE_24h) > 0:     # 0 ~ 30% 상승
+            CURRENT_CRYPTO_CHANGE_EMOJI = ":arrow_up:"            
+        elif -15 <= float(CURRENT_CRYPTO_PERCENT_CHANGE_24h) < 0:     # 0 ~ 15% 하락
+            CURRENT_CRYPTO_CHANGE_EMOJI = ":arrow_down:"
+        elif 50 >= float(CURRENT_CRYPTO_PERCENT_CHANGE_24h) > 30:       # 30% ~ 50% 상승
+            CURRENT_CRYPTO_CHANGE_EMOJI = ":arrow_double_up:"
+        elif -30 <= float(CURRENT_CRYPTO_PERCENT_CHANGE_24h) < -15:        # 15 ~ 30% 하락
+            CURRENT_CRYPTO_CHANGE_EMOJI = ":arrow_double_down:"
+        elif float(CURRENT_CRYPTO_PERCENT_CHANGE_24h) > 50:             # 50% 초과 상승
+            CURRENT_CRYPTO_CHANGE_EMOJI = ":fire:"
+        elif float(CURRENT_CRYPTO_PERCENT_CHANGE_24h) < -30:              # 30% 초과 하락
+            CURRENT_CRYPTO_CHANGE_EMOJI = ":cloud_lightning:"
+        else:                                                           # 보합 상태(변동률 0%)
+            CURRENT_CRYPTO_CHANGE_EMOJI = ":arrows_counterclockwise:"
+
         CURRENT_CRYPTO_PERCENT_CHANGE_24h = "{:,}".format(float(CURRENT_CRYPTO_PERCENT_CHANGE_24h)) + " %"
         #print("24시간 변동률 : " + CURRENT_CRYPTO_KRW_CHANGE_24h + " ( " + CURRENT_CRYPTO_PERCENT_CHANGE_24h + " ) ")
 
@@ -79,8 +102,7 @@ def getCryptocurrencyInfo(symbol):
         #print()
 
         # str()을 하지 않으면 Discord Embed에서 출력이 제대로 되지 않을 수 있다.
-        return str(CRYPTO_KR_NAME), str(CURRENT_CRYPTO_VALUE_KRW), str(CURRENT_CRYPTO_VALUE_OPENING_00h), str(CURRENT_CRYPTO_VALUE_MIN_00h), str(CURRENT_CRYPTO_VALUE_MAX_00h), str(CURRENT_CRYPTO_UNIT_TRADE_24h), str(CURRENT_CRYPTO_KRW_TRADE_24h), str(CURRENT_CRYPTO_KRW_CHANGE_24h), str(CURRENT_CRYPTO_PERCENT_CHANGE_24h), str(CURRENT_UPDATE_TIME), str(_RUNNING_TIME)
-
+        return str(CRYPTO_KR_NAME), str(CURRENT_CRYPTO_VALUE_KRW), str(CURRENT_CRYPTO_VALUE_OPENING_00h), str(CURRENT_CRYPTO_VALUE_MIN_00h), str(CURRENT_CRYPTO_VALUE_MAX_00h), str(CURRENT_CRYPTO_UNIT_TRADE_24h), str(CURRENT_CRYPTO_KRW_TRADE_24h), str(CURRENT_CRYPTO_KRW_CHANGE_24h), str(CURRENT_CRYPTO_PERCENT_CHANGE_24h), str(CURRENT_UPDATE_TIME), str(_RUNNING_TIME), str(CURRENT_CRYPTO_CHANGE_EMOJI), str(CRYPTO_PICTURE_URL)
 
 def getNameFromCryptoSymbol(symbol):
 
@@ -101,6 +123,30 @@ def getNameFromCryptoSymbol(symbol):
     file.close()
 
     return name
+
+def getCryptocurrencyURL(symbol):
+
+    file = open('./resource/cryptocurrencyLogo/cryptoLogoURL.txt','rt')
+
+    try:
+        while True:
+            line = file.readline()
+            #print(line)
+            #print(line.split('  ')[1].strip())      # BTC, XRP, ETH..등만 잘라서 가져오기
+            if symbol == line.split('  ')[1].strip():
+                returnURL = line.split(' ')[0]
+                break
+            if not line:
+                return 404
+    except:
+        return 404
+
+    file.close()
+
+    return returnURL
+
+# print(getCryptocurrencyInfo("LF"))
+# print(getCryptocurrencyInfo("BTC"))
 
 # print(getCryptocurrencyInfo("VET"))
 # print(getCryptocurrencyInfo("BTC"))

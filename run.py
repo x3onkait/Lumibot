@@ -3,6 +3,8 @@ import time
 import datetime
 from discord.ext import commands
 
+import os
+
 ############################# 직접 만든 모듈 ##################################
 
 import COMMAND_SHOW_EX_.getCryptocurrencyInfo       # 암호화폐 정보
@@ -60,7 +62,7 @@ async def show(ctx, *option):
         embed = discord.Embed(title = "information", description = "봇 정보",  timestamp=datetime.datetime.utcnow(), color = 0x32cd32)
         embed.add_field(name = "개발 언어", value = "PYTHON", inline = False)
         embed.add_field(name = "개발자", value = "Garam Lee", inline = True)
-        embed.set_image(url="https://i.imgur.com/jWoZqzG.jpg")
+        embed.set_image(url="https://i.imgur.com/w1pAySc.jpg")
         embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
         await ctx.send(embed = embed)
         print("COMMAND EXECUTED SUCCESSFULLY - show info")
@@ -76,20 +78,28 @@ async def show(ctx, *option):
                 print("COMMAND ERROR - command [show crypto] No Listed Cryptocurrency Trial")
 
             #(cryptocurrency_KRname, cryptocurrency_to_KRW, cryptocurrency_change_KRW, cryptocurrency_change_PERCENT, cryptocurrency_transaction_KRW, cryptocurrency_transaction_CRYPTO, running_time) = COMMAND_SHOW_EX_.getCryptocurrencyInfo.getCryptocurrencyInfo(str(option[2]))
-            CRYPTO_KR_NAME, CURRENT_CRYPTO_VALUE_KRW, CURRENT_CRYPTO_VALUE_OPENING_00h, CURRENT_CRYPTO_VALUE_MIN_00h, CURRENT_CRYPTO_VALUE_MAX_00h, CURRENT_CRYPTO_UNIT_TRADE_24h, CURRENT_CRYPTO_KRW_TRADE_24h, CURRENT_CRYPTO_KRW_CHANGE_24h, CURRENT_CRYPTO_PERCENT_CHANGE_24h, CURRENT_UPDATE_TIME, _RUNNING_TIME = COMMAND_SHOW_EX_.getCryptocurrencyInfo.getCryptocurrencyInfo(str(option[2]))
+            CRYPTO_KR_NAME, CURRENT_CRYPTO_VALUE_KRW, CURRENT_CRYPTO_VALUE_OPENING_00h, CURRENT_CRYPTO_VALUE_MIN_00h, CURRENT_CRYPTO_VALUE_MAX_00h, CURRENT_CRYPTO_UNIT_TRADE_24h, CURRENT_CRYPTO_KRW_TRADE_24h, CURRENT_CRYPTO_KRW_CHANGE_24h, CURRENT_CRYPTO_PERCENT_CHANGE_24h, CURRENT_UPDATE_TIME, _RUNNING_TIME, CURRENT_CRYPTO_CHANGE_EMOJI, CRYPTO_PICTURE_URL = COMMAND_SHOW_EX_.getCryptocurrencyInfo.getCryptocurrencyInfo(str(option[2]))
             if CRYPTO_KR_NAME == 404:
                 embed = discord.Embed(title = "No Response Exception", description = "현재 거래소에서 응답이 Timeout 내에 돌아오지 않고 있습니다.\n요청을 단기간에 과도하게 보내지 마시고, 잠시 후 다시 시도하세요.", color = 0xff0000)
                 embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
                 await ctx.send(embed = embed)
                 print("COMMAND ERROR - command [show crypto] No Response Returned From Source")
+
+            # 진짜 암호화폐 정보
             embed = discord.Embed(title = option[2] + " 암호화폐 정보", description = "정보 제공 : 빗썸(bithumb.com)", timestamp=datetime.datetime.utcnow(), color = 0xeaf27c)
             print("pass crypto_getInfo_phase")
+
+            # 텍스트 중심의 정보 출력
+            if CRYPTO_PICTURE_URL != "404":     # getCryptocurrencyInfo()에서 URL을 string형태로 반환함
+                embed.set_thumbnail(url = CRYPTO_PICTURE_URL)
+            
             embed.add_field(name = "암호화폐 이름", value = CRYPTO_KR_NAME, inline = True)
             embed.add_field(name = "현재 가격", value = CURRENT_CRYPTO_VALUE_KRW, inline = True)
             embed.add_field(name = "00시 기준 종가/저가/고가", value = CURRENT_CRYPTO_VALUE_OPENING_00h + " / " + CURRENT_CRYPTO_VALUE_MIN_00h + " / " + CURRENT_CRYPTO_VALUE_MAX_00h, inline = False)
-            embed.add_field(name = "가격 변동량(24hr)", value = CURRENT_CRYPTO_KRW_CHANGE_24h + "( " + CURRENT_CRYPTO_PERCENT_CHANGE_24h + " )", inline = True)
+            embed.add_field(name = "가격 변동량(24hr)", value = CURRENT_CRYPTO_KRW_CHANGE_24h + "( " + CURRENT_CRYPTO_PERCENT_CHANGE_24h + " " + CURRENT_CRYPTO_CHANGE_EMOJI + " )", inline = True)
             embed.add_field(name = "거래량(24hr)", value = CURRENT_CRYPTO_UNIT_TRADE_24h + "\n" + CURRENT_CRYPTO_KRW_TRADE_24h, inline = True)
             embed.add_field(name = "업데이트 시각", value = CURRENT_UPDATE_TIME, inline = "False")
+
             embed.set_footer(text="Lumibot | From {}({}) | Run Time : {} sec".format(ctx.message.author.name, ctx.author.display_name, _RUNNING_TIME), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
             print("pass stock_FIN_phase")    
@@ -296,4 +306,4 @@ async def on_command_error(ctx, error):
     	#await ctx.send("명령어를 찾지 못했습니다")
         
 
-bot.run('...') #토큰
+bot.run('-') #토큰
