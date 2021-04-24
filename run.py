@@ -296,4 +296,4 @@ async def on_command_error(ctx, error):
     	#await ctx.send("명령어를 찾지 못했습니다")
         
 
-bot.run('ODMyNTcyNDY2MzU4Mzg2Njg5.YHlviA.UL3iRpYKoNst-e3x0kbyg0FW40E') #토큰
+bot.run('...') #토큰
