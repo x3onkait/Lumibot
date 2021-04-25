@@ -11,7 +11,10 @@ import time
 # import sys, os를 사용하고, sys.path.append(...)로 이를 가능하게 한다.
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 # resource 파일 내의 getWonwhaString이란 모듈(*.py)을 가져온다.
-from resource import getWonwhaString
+from resource.sub_function_used_globally import getWonwhaString
+
+# 로깅 처리 함수 불러오기
+from resource.sub_function_used_globally.printCommandLog import printCommandLog as printCommandLog
 ############################################################################
 
 
@@ -24,7 +27,8 @@ def getStockInfo(companyName):
 
     try:
         companyCode = getStockCode(companyName)
-        print("getting information about : " + companyName)
+        printCommandLog("show stock(Function)", "RUNNING", "Getting Stock Information : " + companyName)
+        #print("getting information about : " + companyName)
 
         url = "https://finance.daum.net/api/quote/A" + companyCode + "/sectors"
 
@@ -62,17 +66,18 @@ def getStockInfo(companyName):
     changeRate = str(round((stockData[0][0].get("changeRate") * 100),2)) + " %"                    # 종목 가격 변동률
     
     marketCap = str(stockData[0][0].get("marketCap")).replace('.0','')     # 시가총액
-    marketCap = "≈ " + getWonwhaString.getWonhwaString(int(marketCap)) + " 원"      # 나중에 해결
+    marketCap = "≈ " + getWonwhaString.getWonhwaString(int(marketCap)) + " 원"     
 
     _END_TIME = time.time()
     running_time = round((_END_TIME - _START_TIME), 4)
-    print("running time : ", str(running_time) + " SEC.")
+    printCommandLog("show stock(Function)", "RUNNING", "running time : " + str(running_time) + " sec/pass")
+    #print("running time : ", str(running_time) + " SEC.")
 
     return symbolCode, companyName, tradePrice, changePrice, changeRate, marketCap, str(running_time)
 
 def getStockCode(companyName):
 
-    file = open('./resource/stockCodeList.txt','rt', encoding='UTF8')
+    file = open('./resource/stock_function_data/stockCodeList.txt','rt', encoding='UTF8')
     
     try:
         while True:

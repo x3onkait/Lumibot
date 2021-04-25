@@ -2,8 +2,8 @@ import random
 import string
 
 def getRandomNumber(starter, ender):
-    print(starter)
-    print(ender)
+    #print(starter)
+    #print(ender)
     return random.randrange(starter, ender)
 
 def diceroll():

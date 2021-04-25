@@ -6,6 +6,17 @@ import time, datetime
 
 import json
 
+import sys, os
+
+##################################################################################################
+# 이 getStockInfo.py를 기준으로 1단계 상위 디렉토리 레벨선상에 있는 resource파일을 가져오기 위해
+# import sys, os를 사용하고, sys.path.append(...)로 이를 가능하게 한다.
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+
+# 로깅 처리 함수 불러오기
+from resource.sub_function_used_globally.printCommandLog import printCommandLog as printCommandLog
+##################################################################################################
+
 def getCryptocurrencyInfo(symbol):
 
     _START_TIME = time.time()       # 함수 퍼포먼스(작동 시간) 측정
@@ -17,20 +28,16 @@ def getCryptocurrencyInfo(symbol):
     CRYPTO_PICTURE_URL = getCryptocurrencyURL(symbol)
     
     if CRYPTO_KR_NAME == 404:        # 항목 없음 에러 코드
-        print("Unavailable Cryptocurrency Request")
-        _END_TIME = time.time()
-        _RUNNING_TIME = round((_END_TIME - _START_TIME), 4)
-        print("작동 시간 : " + str(_RUNNING_TIME) + " 초")
-        
+        printCommandLog("show crypto(Function)", "FAILED", "UNAVAILABLE_CRYPTO_REQUEST")
         return 404                              # 함수 종료
 
     if CRYPTO_PICTURE_URL == 404:
-        print("No picture :: Picture will be skipped")
+        printCommandLog("show crypto(Function)", "RUNNING", "NO_CRYPTO_LOGO_PIC_SKIPPED")
         CRYPTO_PICTURE_URL = 404
 
     try:
         response = requests.get(url, timeout=0.9)
-        print("getting information about : " + symbol)
+        printCommandLog("show crypto(Function)", "RUNNING", "Getting Stock Information : " + symbol)
     except:
         return 404
 
@@ -96,17 +103,18 @@ def getCryptocurrencyInfo(symbol):
         #print("업데이트 시간 : " + CURRENT_UPDATE_TIME)
 
         _END_TIME = time.time()
-        _RUNNING_TIME = str(round((_END_TIME - _START_TIME), 4))
-        print("작동 시간 : " + _RUNNING_TIME + " 초")
+        running_time = round((_END_TIME - _START_TIME), 4)
+        printCommandLog("show crypto(Function)", "RUNNING", "running time : " + str(running_time) + " sec/pass")
+        # print("작동 시간 : " + _RUNNING_TIME + " 초")
 
         #print()
 
-        # str()을 하지 않으면 Discord Embed에서 출력이 제대로 되지 않을 수 있다.
-        return str(CRYPTO_KR_NAME), str(CURRENT_CRYPTO_VALUE_KRW), str(CURRENT_CRYPTO_VALUE_OPENING_00h), str(CURRENT_CRYPTO_VALUE_MIN_00h), str(CURRENT_CRYPTO_VALUE_MAX_00h), str(CURRENT_CRYPTO_UNIT_TRADE_24h), str(CURRENT_CRYPTO_KRW_TRADE_24h), str(CURRENT_CRYPTO_KRW_CHANGE_24h), str(CURRENT_CRYPTO_PERCENT_CHANGE_24h), str(CURRENT_UPDATE_TIME), str(_RUNNING_TIME), str(CURRENT_CRYPTO_CHANGE_EMOJI), str(CRYPTO_PICTURE_URL)
+        # str()을 하지 않으면 Discord Embed에서 출력이 제대로 되지 않을 수 있다. 
+        return str(CRYPTO_KR_NAME), str(CURRENT_CRYPTO_VALUE_KRW), str(CURRENT_CRYPTO_VALUE_OPENING_00h), str(CURRENT_CRYPTO_VALUE_MIN_00h), str(CURRENT_CRYPTO_VALUE_MAX_00h), str(CURRENT_CRYPTO_UNIT_TRADE_24h), str(CURRENT_CRYPTO_KRW_TRADE_24h), str(CURRENT_CRYPTO_KRW_CHANGE_24h), str(CURRENT_CRYPTO_PERCENT_CHANGE_24h), str(CURRENT_UPDATE_TIME), str(running_time), str(CURRENT_CRYPTO_CHANGE_EMOJI), str(CRYPTO_PICTURE_URL)
 
 def getNameFromCryptoSymbol(symbol):
 
-    file = open('./resource/cryptocurrencySymbolList.txt','rt', encoding='UTF8')
+    file = open('./resource/crypto_function_data/cryptocurrencySymbolList.txt','rt', encoding='UTF8')
     
     try:
         while True:
@@ -126,7 +134,7 @@ def getNameFromCryptoSymbol(symbol):
 
 def getCryptocurrencyURL(symbol):
 
-    file = open('./resource/cryptocurrencyLogo/cryptoLogoURL.txt','rt')
+    file = open('./resource/crypto_function_data/cryptoLogoURL.txt','rt')
 
     try:
         while True:
