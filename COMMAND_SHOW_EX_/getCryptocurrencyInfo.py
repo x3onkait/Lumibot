@@ -15,6 +15,9 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 # 로깅 처리 함수 불러오기
 from resource.sub_function_used_globally.printCommandLog import printCommandLog as printCommandLog
+
+# 단위 붙이기
+from resource.sub_function_used_globally import getWonwhaString
 ##################################################################################################
 
 def getCryptocurrencyInfo(symbol):
@@ -28,16 +31,16 @@ def getCryptocurrencyInfo(symbol):
     CRYPTO_PICTURE_URL = getCryptocurrencyURL(symbol)
     
     if CRYPTO_KR_NAME == 404:        # 항목 없음 에러 코드
-        printCommandLog("show crypto(Function)", "FAILED", "UNAVAILABLE_CRYPTO_REQUEST")
+        printCommandLog("show crypto --symbol(Function)", "FAILED", "UNAVAILABLE_CRYPTO_REQUEST")
         return 404                              # 함수 종료
 
     if CRYPTO_PICTURE_URL == 404:
-        printCommandLog("show crypto(Function)", "RUNNING", "NO_CRYPTO_LOGO_PIC_SKIPPED")
+        printCommandLog("show crypto --symbol(Function)", "RUNNING", "NO_CRYPTO_LOGO_PIC_SKIPPED")
         CRYPTO_PICTURE_URL = 404
 
     try:
         response = requests.get(url, timeout=0.9)
-        printCommandLog("show crypto(Function)", "RUNNING", "Getting Stock Information : " + symbol)
+        printCommandLog("show crypto --symbol(Function)", "RUNNING", "Getting Stock Information : " + symbol)
     except:
         return 404
 
@@ -104,13 +107,55 @@ def getCryptocurrencyInfo(symbol):
 
         _END_TIME = time.time()
         running_time = round((_END_TIME - _START_TIME), 4)
-        printCommandLog("show crypto(Function)", "RUNNING", "running time : " + str(running_time) + " sec/pass")
+        printCommandLog("show crypto --symbol(Function)", "RUNNING", "running time : " + str(running_time) + " sec/pass")
         # print("작동 시간 : " + _RUNNING_TIME + " 초")
 
         #print()
 
         # str()을 하지 않으면 Discord Embed에서 출력이 제대로 되지 않을 수 있다. 
         return str(CRYPTO_KR_NAME), str(CURRENT_CRYPTO_VALUE_KRW), str(CURRENT_CRYPTO_VALUE_OPENING_00h), str(CURRENT_CRYPTO_VALUE_MIN_00h), str(CURRENT_CRYPTO_VALUE_MAX_00h), str(CURRENT_CRYPTO_UNIT_TRADE_24h), str(CURRENT_CRYPTO_KRW_TRADE_24h), str(CURRENT_CRYPTO_KRW_CHANGE_24h), str(CURRENT_CRYPTO_PERCENT_CHANGE_24h), str(CURRENT_UPDATE_TIME), str(running_time), str(CURRENT_CRYPTO_CHANGE_EMOJI), str(CRYPTO_PICTURE_URL)
+
+def getCryptocurrencyBrief():       # [developing::개발중]
+    _START_TIME = time.time()       # 함수 퍼포먼스(작동 시간) 측정
+
+    url = "https://coinranking.com/overview"
+
+    try:
+        response = requests.get(url, timeout = 1)
+        printCommandLog("show crypto --brief(Function)", "RUNNING", "Getting Brief Information")
+    except:
+        allMarketCap = 404              # 일종의 비표 역할. 실패할 경우 이 데이터가 실패를 알림.
+        return 404
+
+    if response.status_code == 200:
+        html = response.text
+        soup = BeautifulSoup(html, 'html.parser')
+        
+        allMarketCap = soup.select_one('#__layout > div > section > div.stats-list > table > tbody > tr:nth-child(1) > td > abbr')
+        allMarketCap = str(allMarketCap).split()[3].replace('title="','').replace('"><!--','')[:-3]
+        allMarketCap = " ≈ " + getWonwhaString.getWonhwaString(int(allMarketCap.replace(',',''))) + " 달러"
+        #print(allMarketCap)
+        
+        dayCryptoVolume = soup.select_one('#__layout > div > section > div.stats-list > table > tbody > tr:nth-child(2) > td > abbr')
+        dayCryptoVolume = str(dayCryptoVolume).split()[3].replace('title="','').replace('"><!--','')[:-3]
+        dayCryptoVolume = " ≈ " + getWonwhaString.getWonhwaString(int(dayCryptoVolume.replace(',',''))) + " 달러"
+        #print(dayCryptoVolume)
+    
+        allCryptoQuantity = soup.select_one('#__layout > div > section > div.stats-list > table > tbody > tr:nth-child(3) > td')
+        allCryptoQuantity = allCryptoQuantity.get_text().strip() + " 개"
+        #print(allCryptoQuantity)
+
+        allCryptoExchanges = soup.select_one('#__layout > div > section > div.stats-list > table > tbody > tr:nth-child(4) > td')
+        allCryptoExchanges = allCryptoExchanges.get_text().strip() + " 개"
+        #print(allCryptoExchanges)
+
+        _END_TIME = time.time()
+        running_time = round((_END_TIME - _START_TIME), 4)
+        printCommandLog("show crypto --brief(Function)", "RUNNING", "running time : " + str(running_time) + " sec/pass")
+
+        return str(allMarketCap), str(dayCryptoVolume), str(allCryptoQuantity), str(allCryptoExchanges), str(running_time)
+
+
 
 def getNameFromCryptoSymbol(symbol):
 
@@ -152,6 +197,8 @@ def getCryptocurrencyURL(symbol):
     file.close()
 
     return returnURL
+
+# print(getCryptocurrencyBrief())
 
 # print(getCryptocurrencyInfo("LF"))
 # print(getCryptocurrencyInfo("BTC"))

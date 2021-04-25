@@ -43,20 +43,32 @@ async def show(ctx, *option):
 
     elif option[0] == "help":                 # help | 도움말 출력
         embed = discord.Embed(title = "command help", description = "봇 정보",  timestamp=datetime.datetime.utcnow(), color = 0x6a5acd)
-        embed.add_field(name = "show 계열 명령어", value = 
-                '''show hello(인사) | show help(도움말) | show info(정보) 
-                show population(세계 인구) | show currentTime(현재 시간)
-                show stock --search [국내 주식 종목명(이름)] (국내 주식 시세 검색)
-                show crypto --symbol [암호화폐 기호(ex. BTC)] (암호화폐 시세 조회)''', inline = False)
-        embed.add_field(name = "echo 계열 명령어", value = 
-                '''echo [입력값] --count [횟수(1~20)] (입력값 출력)''', inline = False)
-        embed.add_field(name = "calculate 계열 명령어", value = 
-                '''calculate [숫자] [+|-|*|/|**(거듭제곱)|%(나머지)|&,AND,and||,OR,or|^,XOR,xor] [숫자]\n''', inline = False)
-        embed.add_field(name = "random 계열 명령어", value = 
-                '''random --start [시작숫자] --end [끝 숫자] (범위 내 랜덤 숫자 출력)
-                random --rollthedice (주사위 굴리기)
-                random --getAlphanumeric --length [길이(1~256)] (영숫자 혼합 난수 생성)
-                random --getHexadecimal --length [길이(1~256)] (16진수 혼합 난수 생성)''', inline = False)
+        embed.add_field(name = "```show``` 계열 명령어", value = 
+                '''
+                인사```show hello```
+                도움말```show help```
+                봇 정보```show info``` 
+                현재 세계 인구 통계```show population```
+                현재 시간 보기```show currentTime```
+                국내 주식 시세 검색(다음 금융 제공)```show stock --search [국내 주식 종목명(이름)]```
+                암호화폐 시세 검색(빗썸 제공)```show crypto --symbol [암호화폐 기호(ex. BTC)]```
+                암호화폐 통계 요약(전세계/코인랭킹 제공)```show crypto --brief```
+                ''', inline = False)
+        embed.add_field(name = "```echo``` 계열 명령어", value = 
+                '''
+                입력값 그대로 출력하기(따라하기)```echo [입력값] --count [횟수(1~20)]```
+                ''', inline = False)
+        embed.add_field(name = "```calculate``` 계열 명령어", value = 
+                '''
+                간단한 수식 계산(사칙연산/나머지/비트논리연산)```calculate [숫자] [+|-|*|/|**(거듭제곱)|%(나머지)|&,AND,and||,OR,or|^,XOR,xor] [숫자]```
+                ''', inline = False)
+        embed.add_field(name = "```random``` 계열 명령어", value = 
+                '''
+                지정한 범위 내에서 랜덤 숫자 출력하기```random --start [시작숫자] --end [끝 숫자]```
+                주사위 굴리기(1 ~ 6)```random --rollthedice```
+                영숫자 혼합 난수 생성하기```random --getAlphanumeric --length [길이(1~256)]```
+                16진수 난수 생성하기```random --getHexadecimal --length [길이(1~256)]```
+                ''', inline = False)
         embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
         await ctx.send(embed = embed)
         printCommandLog("show help", "OK")
@@ -78,7 +90,7 @@ async def show(ctx, *option):
                 embed = discord.Embed(title = "No Listed Cryptocurrency", description = "현재 데이터베이스에 제대로 등록되지 않았거나,\n 입력값이 잘못된 것 같습니다(Bithumb 거래소 기준).\n 입력값을 한번 더 확인해주세요.", color = 0xff0000)
                 embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
                 await ctx.send(embed = embed)
-                printCommandLog("show crypto", "FAILED", "NO_LISTED_CRYPTO_TRIAL")
+                printCommandLog("show crypto --symbol", "FAILED", "NO_LISTED_CRYPTO_TRIAL")
 
             #(cryptocurrency_KRname, cryptocurrency_to_KRW, cryptocurrency_change_KRW, cryptocurrency_change_PERCENT, cryptocurrency_transaction_KRW, cryptocurrency_transaction_CRYPTO, running_time) = COMMAND_SHOW_EX_.getCryptocurrencyInfo.getCryptocurrencyInfo(str(option[2]))
             CRYPTO_KR_NAME, CURRENT_CRYPTO_VALUE_KRW, CURRENT_CRYPTO_VALUE_OPENING_00h, CURRENT_CRYPTO_VALUE_MIN_00h, CURRENT_CRYPTO_VALUE_MAX_00h, CURRENT_CRYPTO_UNIT_TRADE_24h, CURRENT_CRYPTO_KRW_TRADE_24h, CURRENT_CRYPTO_KRW_CHANGE_24h, CURRENT_CRYPTO_PERCENT_CHANGE_24h, CURRENT_UPDATE_TIME, _RUNNING_TIME, CURRENT_CRYPTO_CHANGE_EMOJI, CRYPTO_PICTURE_URL = COMMAND_SHOW_EX_.getCryptocurrencyInfo.getCryptocurrencyInfo(str(option[2]))
@@ -86,11 +98,11 @@ async def show(ctx, *option):
                 embed = discord.Embed(title = "No Response Exception", description = "현재 거래소에서 응답이 Timeout 내에 돌아오지 않고 있습니다.\n요청을 단기간에 과도하게 보내지 마시고, 잠시 후 다시 시도하세요.", color = 0xff0000)
                 embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
                 await ctx.send(embed = embed)
-                printCommandLog("show crypto", "FAILED", "NO_RESPONSE_RETURNED")
+                printCommandLog("show crypto --symbol", "FAILED", "NO_RESPONSE_RETURNED")
 
             # 진짜 암호화폐 정보
             embed = discord.Embed(title = option[2] + " 암호화폐 정보", description = "정보 제공 : 빗썸(bithumb.com)", timestamp=datetime.datetime.utcnow(), color = 0xeaf27c)
-            printCommandLog("show crypto", "RUNNING", "INIT_GET_INFO_PHASE")
+            printCommandLog("show crypto --symbol", "RUNNING", "INIT_GET_INFO_PHASE")
 
             # 텍스트 중심의 정보 출력
             if CRYPTO_PICTURE_URL != "404":     # getCryptocurrencyInfo()에서 URL을 string형태로 반환함
@@ -105,15 +117,40 @@ async def show(ctx, *option):
 
             embed.set_footer(text="Lumibot | From {}({}) | Run Time : {} sec".format(ctx.message.author.name, ctx.author.display_name, _RUNNING_TIME), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
-            printCommandLog("show crypto", "RUNNING", "FIN_GET_INFO_PHASE")   
-            printCommandLog("show crypto", "OK")    
+            printCommandLog("show crypto --symbol", "RUNNING", "FIN_GET_INFO_PHASE")   
+            printCommandLog("show crypto --symbol", "OK")    
 
         else:
             embed = discord.Embed(title = "Illegal Argument", description = "제대로 지원되는 입력 형식이 아닙니다.",  timestamp=datetime.datetime.utcnow(),  color = 0xff0000)
             embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
-            printCommandLog("show crypto", "FAILED", "ILLEGAL_ARGUMENT_DETECTED")        
+            printCommandLog("show crypto --symbol", "FAILED", "ILLEGAL_ARGUMENT_DETECTED")        
 
+    elif option[0] == "crypto" and option[1] == "--brief":      # 암호화폐 시장 요약
+        
+        if len(option) == 2:
+            allMarketCap, dayCryptoVolume, allCryptoQuantity, allCryptoExchanges, running_time = COMMAND_SHOW_EX_.getCryptocurrencyInfo.getCryptocurrencyBrief()
+
+            if allMarketCap == 404:     # 정보 받아오기 실패
+                embed = discord.Embed(title = "No Response Exception", description = "현재 Coinranking 측에서 응답이 Timeout 내에 돌아오지 않고 있습니다.\n요청을 단기간에 과도하게 보내지 마시고, 잠시 후 다시 시도하세요.", color = 0xff0000)
+                embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
+                await ctx.send(embed = embed)
+                printCommandLog("show crypto --brief", "FAILED", "NO_RESPONSE_RETURNED")
+
+            embed = discord.Embed(title = "전세계 암호화폐 시장 정보", description = "정보 제공 : 코인랭킹(coinranking.com)", timestamp=datetime.datetime.utcnow(), color = 0x126BFF)
+            printCommandLog("show crypto --brief", "RUNNING", "INIT_GET_INFO_PHASE") 
+
+            embed.add_field(name = "전세계 암호화폐 시가총액", value = allMarketCap, inline = False)
+            embed.add_field(name = "전세계 최근 1일간 거래량", value = dayCryptoVolume, inline = False)
+            embed.add_field(name = "등록된 암호화폐 종류(개수)", value = allCryptoQuantity, inline = True)
+            embed.add_field(name = "등록된 암호화폐 거래소", value = allCryptoExchanges, inline = True)
+            embed.set_footer(text="Lumibot | From {}({}) | Run Time : {} sec".format(ctx.message.author.name, ctx.author.display_name, running_time), icon_url = ctx.author.avatar_url)
+            await ctx.send(embed = embed)
+
+            printCommandLog("show crypto --brief", "RUNNING", "FIN_GET_INFO_PHASE")   
+            printCommandLog("show crypto --brief", "OK")
+
+    
     elif option[0] == "stock" and option[1] == "--search":
 
         if len(option) == 3:
@@ -122,14 +159,14 @@ async def show(ctx, *option):
                 embed = discord.Embed(title = "No Listed Company", description = "현재 데이터베이스에 제대로 등록되지 않았거나,\n공식적으로 상장한 기업이 아닙니다. 입력값을 한번 더 확인해주세요.", timestamp=datetime.datetime.utcnow(),  color = 0xff0000)
                 embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
                 await ctx.send(embed = embed)
-                printCommandLog("show stock", "FAILED", "NO_LISTED_COMPANY_TRIAL")
+                printCommandLog("show stock --search", "FAILED", "NO_LISTED_COMPANY_TRIAL")
             embed = discord.Embed(title = option[2] + " 주식 정보", description = "금융 정보 제공 : 다음 금융",  timestamp=datetime.datetime.utcnow(), color = 0xeaf27c)
             (symbolCode, companyName, tradePrice, changePrice, changeRate, marketCap, running_time) = COMMAND_SHOW_EX_.getStockInfo.getStockInfo(str(option[2]))
             if symbolCode == 404:
                 embed = discord.Embed(title = "No Response Exception", description = "현재 금융 페이지에서 응답이 Timeout 내에 돌아오지 않고 있습니다.\n요청을 단기간에 과도하게 보내지 마시고, 잠시 후 다시 시도하세요.", color = 0xff0000)
                 embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
                 await ctx.send(embed = embed)
-                printCommandLog("show stock", "FAILED", "NO_RESPONSE_RETURNED")
+                printCommandLog("show stock --search", "FAILED", "NO_RESPONSE_RETURNED")
 
             printCommandLog("show stock", "RUNNING", "INIT_GET_INFO_PHASE")
             embed.add_field(name = "종목 코드", value = symbolCode + "(" + companyName + ")", inline = False)
@@ -138,14 +175,14 @@ async def show(ctx, *option):
             embed.add_field(name = "시가 총액", value = marketCap, inline = False)
             embed.set_footer(text="Lumibot | From {}({}) | Run time : {} sec".format(ctx.message.author.name, ctx.author.display_name, running_time), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
-            printCommandLog("show stock", "RUNNING", "PASS_GET_INFO_PHASE")
-            printCommandLog("show stock", "OK")
+            printCommandLog("show stock --search", "RUNNING", "PASS_GET_INFO_PHASE")
+            printCommandLog("show stock --search", "OK")
 
         else:
             embed = discord.Embed(title = "Illegal Argument", description = "제대로 지원되는 입력 형식이 아닙니다.",  timestamp=datetime.datetime.utcnow(),  color = 0xff0000)
             embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
-            printCommandLog("stock", "FAILED", "ILLEGAL_ARGUMENT_DETECTED")
+            printCommandLog("stock --search", "FAILED", "ILLEGAL_ARGUMENT_DETECTED")
     
     elif option[0] == "currentTime":
             embed = discord.Embed(title = "Current Time", description = "", timestamp=datetime.datetime.utcnow(), color = 0x00e5a3)
@@ -316,5 +353,5 @@ async def on_command_error(ctx, error):
         printCommandLog("NaN", "FAILED", "NON_EXIST_COMMAND_INPUT")
     	#await ctx.send("명령어를 찾지 못했습니다")
         
-
-bot.run('ODMyNTcyNDY2MzU4Mzg2Njg5.YHlviA.koAG233nB7TnUz-PDuPZ2mnKGYE') #토큰
+# ENTER_MY_OWN_DISCORD_BOT_TOKEN
+bot.run('ENTER_MY_OWN_DISCORD_BOT_TOKEN') #토큰

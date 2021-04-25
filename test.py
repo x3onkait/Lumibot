@@ -1,4 +1,7 @@
-# resource\sub_function_used_globally\printCommandLog.py
-from resource.sub_function_used_globally.printCommandLog import printCommandLog as printCommandLog
+import requests
 
-printCommandLog("123", "OK")
+url = "https://api.upbit.com/v1/ticker"
+
+response = requests.request("GET", url)
+
+print(response.text)
