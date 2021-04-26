@@ -3,16 +3,17 @@
 
 from datetime import datetime
 
+                    # fromWho : (미구현) 누가 명령을 실행했는지에 대한 정보
                     # command : 실행한 명령어
                     # status : 실행한 명령어의 결과(상태)
                     # message : 메시지
-                    # fromWho : (미구현) 누가 명령을 실행했는지에 대한 정보
-def printCommandLog(command, status, *message):
+def printCommandLog(fromWho, command, status, *message):
     CURRENT_TIME = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
     
-    COMMAND = "%-30s" % command         # 정렬
-    STATUS = "%-25s" % status           # 정렬
-    LOG_MESSAGE = "[ " + CURRENT_TIME + " ] > " + " COMMAND = " + COMMAND + "\tSTATUS = " + STATUS
+    FROMWHO = str(fromWho)
+    COMMAND = "%s" % command         # 정렬
+    STATUS = "%s" % status           # 정렬
+    LOG_MESSAGE = "[ " + CURRENT_TIME + " ] : " + "@" + FROMWHO + " --> " + " COMMAND = " + COMMAND + " | STATUS = " + STATUS
     print(LOG_MESSAGE)
 
     if message:
@@ -23,5 +24,6 @@ def printCommandLog(command, status, *message):
 
     # return LOG_MESSAGE
 
-# printCommandLog("show hello", "OK", "test123")
-# printCommandLog("show hello", "OK")
+# printCommandLog("TEST#1234", "short command", "OK", "test123")
+# printCommandLog("TEST#1234", "longlonglonglonglonglonglonglong command", "OK", "test123")
+# printCommandLog("ASDF#0000", "show hello", "OK")

@@ -47,7 +47,7 @@ def getLOLUserStatistics(username):
             USER_PROFILE_PICTURE = soup.select_one('body > div.l-wrap.l-wrap--summoner > div.l-container > div > div > div.Header > div.Face > div > img')
             USER_PROFILE_PICTURE = str(USER_PROFILE_PICTURE).split()[2].replace('src="','').replace("\"/>",'')
             USER_PROFILE_PICTURE = "https:" + USER_PROFILE_PICTURE
-            print(USER_PROFILE_PICTURE)
+            # print(USER_PROFILE_PICTURE)
 
             # 유저 랭킹 / 보다 가독성 좋게 잘라서 다시 알려주기
             try:
