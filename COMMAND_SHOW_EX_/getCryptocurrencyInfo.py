@@ -115,7 +115,7 @@ def getCryptocurrencyInfo(symbol):
         # str()을 하지 않으면 Discord Embed에서 출력이 제대로 되지 않을 수 있다. 
         return str(CRYPTO_KR_NAME), str(CURRENT_CRYPTO_VALUE_KRW), str(CURRENT_CRYPTO_VALUE_OPENING_00h), str(CURRENT_CRYPTO_VALUE_MIN_00h), str(CURRENT_CRYPTO_VALUE_MAX_00h), str(CURRENT_CRYPTO_UNIT_TRADE_24h), str(CURRENT_CRYPTO_KRW_TRADE_24h), str(CURRENT_CRYPTO_KRW_CHANGE_24h), str(CURRENT_CRYPTO_PERCENT_CHANGE_24h), str(CURRENT_UPDATE_TIME), str(running_time), str(CURRENT_CRYPTO_CHANGE_EMOJI), str(CRYPTO_PICTURE_URL)
 
-def getCryptocurrencyBrief():       # [developing::개발중]
+def getCryptocurrencyBrief():
     _START_TIME = time.time()       # 함수 퍼포먼스(작동 시간) 측정
 
     url = "https://coinranking.com/overview"

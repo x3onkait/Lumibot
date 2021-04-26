@@ -354,4 +354,4 @@ async def on_command_error(ctx, error):
     	#await ctx.send("명령어를 찾지 못했습니다")
         
 # ENTER_MY_OWN_DISCORD_BOT_TOKEN
-bot.run('ENTER_MY_OWN_DISCORD_BOT_TOKEN') #토큰
+bot.run('# ENTER_MY_OWN_DISCORD_BOT_TOKEN') #토큰
