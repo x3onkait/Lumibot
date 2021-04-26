@@ -11,6 +11,7 @@ import COMMAND_SHOW_EX_.getCryptocurrencyInfo       # 암호화폐 정보
 import COMMAND_SHOW_EX_.getStockInfo                # 주식 정보
 import COMMAND_SHOW_EX_.getCurrentTime              # 현재 시간 정보
 import COMMAND_SHOW_EX_.getWorldPopulation          # 인구 정보
+import COMMAND_SHOW_EX_.getGameStatistics           # 게임 전적 정보
 
 import COMMAND_RANDOM_.randomToolBox        # 난수 관련
 import COMMAND_CALCULATE_.calculator        # 계산기 역할을 하는 다양한 모듈들
@@ -50,6 +51,7 @@ async def show(ctx, *option):
                 봇 정보```show info``` 
                 현재 세계 인구 통계```show population```
                 현재 시간 보기```show currentTime```
+                리그 오브 레전드 게임 전적 조회(유저명 검색)```show gameStat --LOL --username [유저명]```
                 국내 주식 시세 검색(다음 금융 제공)```show stock --search [국내 주식 종목명(이름)]```
                 암호화폐 시세 검색(빗썸 제공)```show crypto --symbol [암호화폐 기호(ex. BTC)]```
                 암호화폐 통계 요약(전세계/코인랭킹 제공)```show crypto --brief```
@@ -81,6 +83,48 @@ async def show(ctx, *option):
         embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
         await ctx.send(embed = embed)
         printCommandLog("show info", "OK")
+
+    elif option[0] == "gameStat" and option[1] == "--LOL" and option[2] == "--username":
+
+        if len(option) == 4:
+
+            USERNAME, USERLEVEL, USER_PROFILE_PICTURE, USERRANK, TIER_SYMBOL_PIC_URL, TIER_SOLO_RANK_STEP, TIER_SOLO_LEAGUE_POINT, TIER_SOLO_GAME_PLAY_WIN, TIER_SOLO_GAME_PLAY_LOSE, TIER_SOLO_GAME_WINNING_RATIO, running_time = COMMAND_SHOW_EX_.getGameStatistics.getLOLUserStatistics(str(option[3]))
+            print(USERNAME)
+            if USERNAME == 404:
+                embed = discord.Embed(title = "No Response Exception", description = "현재 전적 조회소 op.gg 에서 응답이 Timeout 내에 돌아오지 않고 있습니다.\n요청을 단기간에 과도하게 보내지 마시고, 잠시 후 다시 시도하세요.", color = 0xff0000)
+                embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
+                await ctx.send(embed = embed)
+                printCommandLog("show gameStat --LOL --username {}".format(str(option[3])), "FAILED", "NO_RESPONSE_RETURNED")
+
+            elif USERNAME == 403:
+                embed = discord.Embed(title = "No Expected Data Received", description = "제대로 된 데이터가 op.gg에서 오지 않았습니다\n오타가 입력되었을 가능성이 매우 높으니 입력값을 다시 한번 확인해주세요.", color = 0xff0000)
+                embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
+                await ctx.send(embed = embed)
+                printCommandLog("show gameStat --LOL --username {}".format(str(option[3])), "FAILED", "NO_EXPECTED_DATA_RECEIVED")
+            
+            printCommandLog("show gameStat --LOL --username {}".format(str(option[3])), "RUNNING", "INIT_GET_INFO_PHASE")
+            embed = discord.Embed(title = "리그 오브 레전드 전적 조회", description = "정보 제공 : OP.GG", timestamp=datetime.datetime.utcnow(), color = 0x307c70)
+
+            embed.set_thumbnail(url = TIER_SYMBOL_PIC_URL)
+            embed.add_field(name = "유저 이름", value = USERNAME, inline = True)
+            embed.add_field(name = '유저 레벨', value = USERLEVEL, inline = True)
+            embed.add_field(name = "유저 랭킹 현황", value = USERRANK, inline = True)
+            embed.add_field(name = "티어 등급", value = TIER_SOLO_RANK_STEP, inline = True)
+            embed.add_field(name = "LP", value = TIER_SOLO_LEAGUE_POINT, inline = True)
+            embed.add_field(name = "승리 / 패배", value = TIER_SOLO_GAME_PLAY_WIN + " / " + TIER_SOLO_GAME_PLAY_LOSE + " ( 승률 : " + TIER_SOLO_GAME_WINNING_RATIO + " )" , inline = True)
+            embed.set_image(url = USER_PROFILE_PICTURE)
+
+            embed.set_footer(text="Lumibot | From {}({}) | Run Time : {} sec | 전적의 모든 랭킹 관련 결과는 솔로 랭크 자료입니다.".format(ctx.message.author.name, ctx.author.display_name, running_time), icon_url = ctx.author.avatar_url)
+            await ctx.send(embed = embed)
+
+            printCommandLog("show gameStat --LOL --username {}".format(str(option[3])), "RUNNING", "FIN_GET_INFO_PHASE")   
+            printCommandLog("show gameStat --LOL --username {}".format(str(option[3])), "OK")
+        
+        else:
+            embed = discord.Embed(title = "Illegal Argument", description = "제대로 지원되는 입력 형식이 아닙니다.",  timestamp=datetime.datetime.utcnow(),  color = 0xff0000)
+            embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
+            await ctx.send(embed = embed)
+            printCommandLog("show gameStat --LOL --username {}".format(str(option[3])), "FAILED", "ILLEGAL_ARGUMENT_DETECTED")   
 
     elif option[0] == "crypto" and option[1] == "--symbol":
 
@@ -150,7 +194,6 @@ async def show(ctx, *option):
             printCommandLog("show crypto --brief", "RUNNING", "FIN_GET_INFO_PHASE")   
             printCommandLog("show crypto --brief", "OK")
 
-    
     elif option[0] == "stock" and option[1] == "--search":
 
         if len(option) == 3:
@@ -354,4 +397,4 @@ async def on_command_error(ctx, error):
     	#await ctx.send("명령어를 찾지 못했습니다")
         
 # ENTER_MY_OWN_DISCORD_BOT_TOKEN
-bot.run('# ENTER_MY_OWN_DISCORD_BOT_TOKEN') #토큰
+bot.run('ODMyNTcyNDY2MzU4Mzg2Njg5.YHlviA.exiAhhglwiM0FbsLU2iMU6RA9OE') #토큰
