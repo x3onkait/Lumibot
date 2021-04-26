@@ -27,7 +27,7 @@ def getStockInfo(companyName):
 
     try:
         companyCode = getStockCode(companyName)
-        printCommandLog("show stock(Function)", "RUNNING", "Getting Stock Information : " + companyName)
+        printCommandLog("show stock --search {} (Function)".format(companyName), "RUNNING", "Getting Stock Information : " + companyName)
         #print("getting information about : " + companyName)
 
         url = "https://finance.daum.net/api/quote/A" + companyCode + "/sectors"
@@ -40,6 +40,7 @@ def getStockInfo(companyName):
 
         response = requests.get(url, headers=headers, timeout=0.9)
     except:
+        printCommandLog("show stock --search {} (Function)".format(companyName), "RUNNING", "NO_RESPONSE_RETURNED")
         return 404, 404, 404, 404, 404, 404, 404
 
     stockData = response.json()
@@ -70,7 +71,7 @@ def getStockInfo(companyName):
 
     _END_TIME = time.time()
     running_time = round((_END_TIME - _START_TIME), 4)
-    printCommandLog("show stock(Function)", "RUNNING", "running time : " + str(running_time) + " sec/pass")
+    printCommandLog("show stock --search {}(Function)".format(companyName), "RUNNING", "running time : " + str(running_time) + " sec/pass")
     #print("running time : ", str(running_time) + " SEC.")
 
     return symbolCode, companyName, tradePrice, changePrice, changeRate, marketCap, str(running_time)

@@ -46,13 +46,11 @@ async def show(ctx, *option):
         embed = discord.Embed(title = "command help", description = "봇 정보",  timestamp=datetime.datetime.utcnow(), color = 0x6a5acd)
         embed.add_field(name = "```show``` 계열 명령어", value = 
                 '''
-                인사```show hello```
-                도움말```show help```
-                봇 정보```show info``` 
-                현재 세계 인구 통계```show population```
-                현재 시간 보기```show currentTime```
+                인사 : `show hello`, 도움말 : `show help`, 봇 정보 : `show info` 
+                현재 세계 인구 통계 : `show population`, 현재 시간 보기 : `show currentTime`
+
                 리그 오브 레전드 게임 전적 조회(유저명 검색)```show gameStat --LOL --username [유저명]```
-                국내 주식 시세 검색(다음 금융 제공)```show stock --search [국내 주식 종목명(이름)]```
+                국내 주식 시세 검색(다음 금융 제공)```show stock --search [국내 주식 종목명(ex. 삼성전자)]```
                 암호화폐 시세 검색(빗썸 제공)```show crypto --symbol [암호화폐 기호(ex. BTC)]```
                 암호화폐 통계 요약(전세계/코인랭킹 제공)```show crypto --brief```
                 ''', inline = False)
@@ -105,14 +103,15 @@ async def show(ctx, *option):
             printCommandLog("show gameStat --LOL --username {}".format(str(option[3])), "RUNNING", "INIT_GET_INFO_PHASE")
             embed = discord.Embed(title = "리그 오브 레전드 전적 조회", description = "정보 제공 : OP.GG", timestamp=datetime.datetime.utcnow(), color = 0x307c70)
 
-            embed.set_thumbnail(url = TIER_SYMBOL_PIC_URL)
+            embed.set_thumbnail(url = USER_PROFILE_PICTURE)
+            embed.set_author(name = " : @{}".format(USERNAME), url = TIER_SYMBOL_PIC_URL, icon_url = TIER_SYMBOL_PIC_URL)
             embed.add_field(name = "유저 이름", value = USERNAME, inline = True)
             embed.add_field(name = '유저 레벨', value = USERLEVEL, inline = True)
             embed.add_field(name = "유저 랭킹 현황", value = USERRANK, inline = True)
             embed.add_field(name = "티어 등급", value = TIER_SOLO_RANK_STEP, inline = True)
             embed.add_field(name = "LP", value = TIER_SOLO_LEAGUE_POINT, inline = True)
             embed.add_field(name = "승리 / 패배", value = TIER_SOLO_GAME_PLAY_WIN + " / " + TIER_SOLO_GAME_PLAY_LOSE + " ( 승률 : " + TIER_SOLO_GAME_WINNING_RATIO + " )" , inline = True)
-            embed.set_image(url = USER_PROFILE_PICTURE)
+            # embed.set_image(url = TIER_SYMBOL_PIC_URL)
 
             embed.set_footer(text="Lumibot | From {}({}) | Run Time : {} sec | 전적의 모든 랭킹 관련 결과는 솔로 랭크 자료입니다.".format(ctx.message.author.name, ctx.author.display_name, running_time), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
@@ -134,7 +133,7 @@ async def show(ctx, *option):
                 embed = discord.Embed(title = "No Listed Cryptocurrency", description = "현재 데이터베이스에 제대로 등록되지 않았거나,\n 입력값이 잘못된 것 같습니다(Bithumb 거래소 기준).\n 입력값을 한번 더 확인해주세요.", color = 0xff0000)
                 embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
                 await ctx.send(embed = embed)
-                printCommandLog("show crypto --symbol", "FAILED", "NO_LISTED_CRYPTO_TRIAL")
+                printCommandLog("show crypto --symbol {}".format(str(option[2])), "FAILED", "NO_LISTED_CRYPTO_TRIAL")
 
             #(cryptocurrency_KRname, cryptocurrency_to_KRW, cryptocurrency_change_KRW, cryptocurrency_change_PERCENT, cryptocurrency_transaction_KRW, cryptocurrency_transaction_CRYPTO, running_time) = COMMAND_SHOW_EX_.getCryptocurrencyInfo.getCryptocurrencyInfo(str(option[2]))
             CRYPTO_KR_NAME, CURRENT_CRYPTO_VALUE_KRW, CURRENT_CRYPTO_VALUE_OPENING_00h, CURRENT_CRYPTO_VALUE_MIN_00h, CURRENT_CRYPTO_VALUE_MAX_00h, CURRENT_CRYPTO_UNIT_TRADE_24h, CURRENT_CRYPTO_KRW_TRADE_24h, CURRENT_CRYPTO_KRW_CHANGE_24h, CURRENT_CRYPTO_PERCENT_CHANGE_24h, CURRENT_UPDATE_TIME, _RUNNING_TIME, CURRENT_CRYPTO_CHANGE_EMOJI, CRYPTO_PICTURE_URL = COMMAND_SHOW_EX_.getCryptocurrencyInfo.getCryptocurrencyInfo(str(option[2]))
@@ -142,11 +141,11 @@ async def show(ctx, *option):
                 embed = discord.Embed(title = "No Response Exception", description = "현재 거래소에서 응답이 Timeout 내에 돌아오지 않고 있습니다.\n요청을 단기간에 과도하게 보내지 마시고, 잠시 후 다시 시도하세요.", color = 0xff0000)
                 embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
                 await ctx.send(embed = embed)
-                printCommandLog("show crypto --symbol", "FAILED", "NO_RESPONSE_RETURNED")
+                printCommandLog("show crypto --symbol {}".format(str(option[2])), "FAILED", "NO_RESPONSE_RETURNED")
 
             # 진짜 암호화폐 정보
             embed = discord.Embed(title = option[2] + " 암호화폐 정보", description = "정보 제공 : 빗썸(bithumb.com)", timestamp=datetime.datetime.utcnow(), color = 0xeaf27c)
-            printCommandLog("show crypto --symbol", "RUNNING", "INIT_GET_INFO_PHASE")
+            printCommandLog("show crypto --symbol {}".format(str(option[2])), "RUNNING", "INIT_GET_INFO_PHASE")
 
             # 텍스트 중심의 정보 출력
             if CRYPTO_PICTURE_URL != "404":     # getCryptocurrencyInfo()에서 URL을 string형태로 반환함
@@ -161,14 +160,14 @@ async def show(ctx, *option):
 
             embed.set_footer(text="Lumibot | From {}({}) | Run Time : {} sec".format(ctx.message.author.name, ctx.author.display_name, _RUNNING_TIME), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
-            printCommandLog("show crypto --symbol", "RUNNING", "FIN_GET_INFO_PHASE")   
-            printCommandLog("show crypto --symbol", "OK")    
+            printCommandLog("show crypto --symbol {}".format(str(option[2])), "RUNNING", "FIN_GET_INFO_PHASE")   
+            printCommandLog("show crypto --symbol {}".format(str(option[2])), "OK")    
 
         else:
             embed = discord.Embed(title = "Illegal Argument", description = "제대로 지원되는 입력 형식이 아닙니다.",  timestamp=datetime.datetime.utcnow(),  color = 0xff0000)
             embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
-            printCommandLog("show crypto --symbol", "FAILED", "ILLEGAL_ARGUMENT_DETECTED")        
+            printCommandLog("show crypto --symbol {}".format(str(option[2])), "FAILED", "ILLEGAL_ARGUMENT_DETECTED")        
 
     elif option[0] == "crypto" and option[1] == "--brief":      # 암호화폐 시장 요약
         
@@ -202,30 +201,32 @@ async def show(ctx, *option):
                 embed = discord.Embed(title = "No Listed Company", description = "현재 데이터베이스에 제대로 등록되지 않았거나,\n공식적으로 상장한 기업이 아닙니다. 입력값을 한번 더 확인해주세요.", timestamp=datetime.datetime.utcnow(),  color = 0xff0000)
                 embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
                 await ctx.send(embed = embed)
-                printCommandLog("show stock --search", "FAILED", "NO_LISTED_COMPANY_TRIAL")
+                printCommandLog("show stock --search {}".format(str(option[2])), "FAILED", "NO_LISTED_COMPANY_TRIAL")
+
             embed = discord.Embed(title = option[2] + " 주식 정보", description = "금융 정보 제공 : 다음 금융",  timestamp=datetime.datetime.utcnow(), color = 0xeaf27c)
             (symbolCode, companyName, tradePrice, changePrice, changeRate, marketCap, running_time) = COMMAND_SHOW_EX_.getStockInfo.getStockInfo(str(option[2]))
+
             if symbolCode == 404:
                 embed = discord.Embed(title = "No Response Exception", description = "현재 금융 페이지에서 응답이 Timeout 내에 돌아오지 않고 있습니다.\n요청을 단기간에 과도하게 보내지 마시고, 잠시 후 다시 시도하세요.", color = 0xff0000)
                 embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
                 await ctx.send(embed = embed)
-                printCommandLog("show stock --search", "FAILED", "NO_RESPONSE_RETURNED")
+                printCommandLog("show stock --search {}".format(str(option[2])), "FAILED", "NO_RESPONSE_RETURNED")
 
-            printCommandLog("show stock", "RUNNING", "INIT_GET_INFO_PHASE")
+            printCommandLog("show stock --search {}".format(str(option[2])), "RUNNING", "INIT_GET_INFO_PHASE")
             embed.add_field(name = "종목 코드", value = symbolCode + "(" + companyName + ")", inline = False)
             embed.add_field(name = "현재 주식 가격", value = tradePrice, inline = False)
             embed.add_field(name = "가격 변동(24hr)", value = changePrice + "(" + changeRate + ")", inline = False)
             embed.add_field(name = "시가 총액", value = marketCap, inline = False)
             embed.set_footer(text="Lumibot | From {}({}) | Run time : {} sec".format(ctx.message.author.name, ctx.author.display_name, running_time), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
-            printCommandLog("show stock --search", "RUNNING", "PASS_GET_INFO_PHASE")
-            printCommandLog("show stock --search", "OK")
+            printCommandLog("show stock --search {}".format(str(option[2])), "RUNNING", "PASS_GET_INFO_PHASE")
+            printCommandLog("show stock --search {}".format(str(option[2])), "OK")
 
         else:
             embed = discord.Embed(title = "Illegal Argument", description = "제대로 지원되는 입력 형식이 아닙니다.",  timestamp=datetime.datetime.utcnow(),  color = 0xff0000)
             embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
-            printCommandLog("stock --search", "FAILED", "ILLEGAL_ARGUMENT_DETECTED")
+            printCommandLog("show stock --search {}".format(str(option[2])), "FAILED", "ILLEGAL_ARGUMENT_DETECTED")
     
     elif option[0] == "currentTime":
             embed = discord.Embed(title = "Current Time", description = "", timestamp=datetime.datetime.utcnow(), color = 0x00e5a3)
@@ -258,7 +259,7 @@ async def echo(ctx, *option):       # option이란 tuple 자료형이 메시지�
     if len(option) == 1:
         # print(option[0])
         await ctx.send(option[0])
-        printCommandLog("echo (single)", "OK", "Echo Message : " + option[0])
+        printCommandLog("echo {}".format(str(option[0])), "OK", "Echo Message : " + option[0])
 
     elif len(option) == 3 and option[1] == '--count':       # 동일 메시지를 여러번 출력할 수 있게 수정
         try:
@@ -272,28 +273,28 @@ async def echo(ctx, *option):       # option이란 tuple 자료형이 메시지�
                 count = 1                    # 반복 변수 초기화
                 while(count <= Repeat):
                     progress = "repeat : {} / count : {} of {}".format(message, count, Repeat)
-                    printCommandLog("echo (multiple)", "RUNNING", progress)
+                    printCommandLog("echo {} --count {}".format(message, Repeat), "RUNNING", progress)
                     await ctx.send(message)
                     time.sleep(0.45)
                     count += 1
-                printCommandLog("echo (multiple)", "OK")
+                printCommandLog("echo {} --count {}".format(message, Repeat), "OK")
             else:                           # 정상적인 횟수 요청이 들어오지 않은 경우
                  embed = discord.Embed(title = "Request Overflow", description = "스패밍 방지를 위해, 반복 횟수는 20회 이하의 자연수로 설정해주세요.",  timestamp=datetime.datetime.utcnow(), color = 0xff0000)
                  embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
                  await ctx.send(embed = embed)
-                 printCommandLog("echo", "FAILED", "REQUEST_OVER_OR_UNDER_FLOW")
+                 printCommandLog("echo {} --count {}".format(message, Repeat), "FAILED", "REQUEST_OVER_OR_UNDER_FLOW")
 
         except:
             embed = discord.Embed(title = "Exception Occured", description = "예외가 발생했습니다.",  timestamp=datetime.datetime.utcnow(), color = 0xff0000)
             embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
-            printCommandLog("echo", "FAILED", "EXCEPTION_OCCURED")
+            printCommandLog("echo {}".format(option), "FAILED", "EXCEPTION_OCCURED")
             
     else:
         embed = discord.Embed(title = "Argument Count Overflow", description = "인자가 너무 많습니다 | 형식 : $echo [메시지] [반복횟수(1~10)] ",  timestamp=datetime.datetime.utcnow(), color = 0xff0000)
         embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
         await ctx.send(embed = embed)
-        printCommandLog("echo", "FAILED", "TOO_MUCH_ARGUMENT")
+        printCommandLog("echo {}".format(option), "FAILED", "TOO_MUCH_ARGUMENT")
 
 # calculate # 계산기
 @bot.command()
@@ -320,16 +321,16 @@ async def calculate(ctx, *option):
             calcResult = COMMAND_CALCULATE_.calculator.bitXOR(int(option[0]), int(option[2]))
         else:
             embed.add_field(name = "Exception Occured", value = "값을 점검해주세요.", inline = False)
-            printCommandLog("calculate", "FAILED", "EXCEPTION_OCCURED")
+            printCommandLog("calculate {} {} {}".format(str(option[0]), str(option[1]), str(option[2])), "FAILED", "EXCEPTION_OCCURED")
         embed.add_field(name = option[0] + " " + option[1] + " " + option[2] + " " + "= ", value = calcResult, inline = False)
         embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
         await ctx.send(embed = embed)
-        printCommandLog("calculate", "OK")
+        printCommandLog("calculate {} {} {}".format(str(option[0]), str(option[1]), str(option[2])), "OK")
     else:
         embed = discord.Embed(title = "Argument Overflow", description = "입력값이 너무 많거나 적습니다. | 형식 : [숫자1] [연산자] [숫자2]",  timestamp=datetime.datetime.utcnow(), color = 0xff0000)
         embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
         await ctx.send(embed = embed)
-        printCommandLog("calculate", "FAILED", "TOO_MUCH_LESS_ARGUMENT")
+        printCommandLog("calculate {}".format(option), "FAILED", "TOO_MUCH_LESS_ARGUMENT")
 
 @bot.command()
 async def random(ctx, *option):
@@ -339,7 +340,7 @@ async def random(ctx, *option):
         result = COMMAND_RANDOM_.randomToolBox.getRandomNumber(int(option[1]), int(option[3]))
                                              # 숫자 자료이므로 문자열로 변경해주기 - 안하면 출력안될수있음
         embed.add_field(name = "범위 내 난수 생성", value = "결과 : " + str(result), inline = False)
-        printCommandLog("random (--getRandomNumber)", "OK", str(result))
+        printCommandLog("random --start {} --end {}".format(str(option[1]), str(option[3])), "OK", str(result))
 
     elif option[0] == "--rollthedice":
         result = COMMAND_RANDOM_.randomToolBox.diceroll()
@@ -351,38 +352,38 @@ async def random(ctx, *option):
             if 1 <= int(option[2]) <= 256:
                 result = COMMAND_RANDOM_.randomToolBox.getAlphanumeric(int(option[2]))
                 embed.add_field(name = "Alphanumeric 타입의 난수를 생성합니다. ", value = "결과 : " + str(result), inline = False)
-                printCommandLog("random --getAlphanumeric32", "OK", result)
+                printCommandLog("random --getAlphanumeric32 --length {}".format(str(option[2])), "OK", result)
             else:
                 embed = discord.Embed(title = "length overflow", description = "1이상 256이하의 자연수를 사용해주세요.",  timestamp=datetime.datetime.utcnow(), color = 0xff0000)
                 embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
                 await ctx.send(embed = embed)
-                printCommandLog("random --getAlphanumeric", "FAILED", "LENGTH_OVER_OR_UNDERFLOW")
+                printCommandLog("random --getAlphanumeric --length {}".format(str(option[2])), "FAILED", "LENGTH_OVER_OR_UNDERFLOW")
         except:
             embed = discord.Embed(title = "Exception Occured", description = "예외가 발생했습니다.",  timestamp=datetime.datetime.utcnow(), color = 0xff0000)
             embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
-            printCommandLog("random --getAlphanumeric", "FAILED", "EXCEPTION_OCCURED")
+            printCommandLog("random --getAlphanumeric --length {}".format(str(option[2])), "FAILED", "EXCEPTION_OCCURED")
 
     elif option[0] == "--getHexadecimal" and option[1] == "--length":
         try:
             if 1 <= int(option[2]) <= 256:
                 result = COMMAND_RANDOM_.randomToolBox.getHexadecimal(int(option[2]))
-                printCommandLog("random --getHexadecimal32", "OK", result)
+                printCommandLog("random --getHexadecimal32 --length {}".format(str(option[1])), "OK", result)
                 embed.add_field(name = "Hexadecimal 타입의 난수를 생성합니다. ", value = "결과 : " + str(result), inline = False)
             else:
                 embed = discord.Embed(title = "length overflow", description = "1이상 256이하의 자연수를 사용해주세요.",  timestamp=datetime.datetime.utcnow(), color = 0xff0000)
                 embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
                 await ctx.send(embed = embed)
-                printCommandLog("random --getHexadecimal", "FAILED", "LENGTH_OVER_OR_UNDERFLOW")
+                printCommandLog("random --getHexadecimal --length {}".format(str(option[1])), "FAILED", "LENGTH_OVER_OR_UNDERFLOW")
         except:
             embed = discord.Embed(title = "Exception Occured", description = "예외가 발생했습니다.",  timestamp=datetime.datetime.utcnow(), color = 0xff0000)
             embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
-            printCommandLog("random --getHexadecimal", "FAILED", "EXCEPTION_OCCURED")
+            printCommandLog("random --getHexadecimal --length {}".format(str(option[1])), "FAILED", "EXCEPTION_OCCURED")
    
     else:
         embed.add_field(name = "Illegal Argument", value = "제대로 지원되는 입력 형식이 아닙니다.", inline = False)
-        printCommandLog("random", "FAILED", "ILLEGAL_ARGUMENT")
+        printCommandLog("random {}".format(option), "FAILED", "ILLEGAL_ARGUMENT")
 
     embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
     await ctx.send(embed = embed)
@@ -393,8 +394,8 @@ async def on_command_error(ctx, error):
         embed = discord.Embed(title = "Command Not Found", description = "지원되지 않는 명령어입니다.",  timestamp=datetime.datetime.utcnow(), color = 0xff0000)
         embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
         await ctx.send(embed = embed)
-        printCommandLog("NaN", "FAILED", "NON_EXIST_COMMAND_INPUT")
+        printCommandLog("{}".format(str(error).split()[1]), "FAILED", "NON_EXIST_COMMAND_INPUT... refer {}".format(error))
     	#await ctx.send("명령어를 찾지 못했습니다")
         
 # ENTER_MY_OWN_DISCORD_BOT_TOKEN
-bot.run('ODMyNTcyNDY2MzU4Mzg2Njg5.YHlviA.exiAhhglwiM0FbsLU2iMU6RA9OE') #토큰
+bot.run('ENTER_MY_OWN_DISCORD_BOT_TOKEN') #토큰

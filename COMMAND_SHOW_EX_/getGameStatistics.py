@@ -106,7 +106,7 @@ def getLOLUserStatistics(username):
 
     except:
         printCommandLog("show gameStat --LOL(Function)", "FAILED", "UNEXPECTED_DATA_RECEIVED")
-        return 403, 403, 403, 403, 403, 403, 403, 403, 403, 403, 403
+        return 403, 403, 403, 403, 403, 403, 403, 403, 403, 403
 
 
 # print(getLOLUserStatistics("오리 빵빵댕이"))

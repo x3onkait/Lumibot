@@ -31,16 +31,16 @@ def getCryptocurrencyInfo(symbol):
     CRYPTO_PICTURE_URL = getCryptocurrencyURL(symbol)
     
     if CRYPTO_KR_NAME == 404:        # 항목 없음 에러 코드
-        printCommandLog("show crypto --symbol(Function)", "FAILED", "UNAVAILABLE_CRYPTO_REQUEST")
+        printCommandLog("show crypto --symbol {} (Function)".format(symbol), "FAILED", "UNAVAILABLE_CRYPTO_REQUEST")
         return 404                              # 함수 종료
 
     if CRYPTO_PICTURE_URL == 404:
-        printCommandLog("show crypto --symbol(Function)", "RUNNING", "NO_CRYPTO_LOGO_PIC_SKIPPED")
+        printCommandLog("show crypto --symbol {} (Function)".format(symbol), "RUNNING", "NO_CRYPTO_LOGO_PIC_SKIPPED")
         CRYPTO_PICTURE_URL = 404
 
     try:
         response = requests.get(url, timeout=0.9)
-        printCommandLog("show crypto --symbol(Function)", "RUNNING", "Getting Stock Information : " + symbol)
+        printCommandLog("show crypto --symbol {} (Function)".format(symbol), "RUNNING", "Getting Stock Information : " + symbol)
     except:
         return 404
 
@@ -107,7 +107,7 @@ def getCryptocurrencyInfo(symbol):
 
         _END_TIME = time.time()
         running_time = round((_END_TIME - _START_TIME), 4)
-        printCommandLog("show crypto --symbol(Function)", "RUNNING", "running time : " + str(running_time) + " sec/pass")
+        printCommandLog("show crypto --symbol {} (Function)".format(symbol), "RUNNING", "running time : " + str(running_time) + " sec/pass")
         # print("작동 시간 : " + _RUNNING_TIME + " 초")
 
         #print()
