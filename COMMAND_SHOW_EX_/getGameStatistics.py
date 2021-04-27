@@ -14,7 +14,7 @@ from resource.sub_function_used_globally.printCommandLog import printCommandLog 
 
 import time
 
-def getLOLUserStatistics(username):
+def getLOLUserStatistics(fromWho, username):
 
     _START_TIME = time.time()       # 함수 퍼포먼스(작동 시간) 측정
 
@@ -23,7 +23,7 @@ def getLOLUserStatistics(username):
 
     try:
         response = requests.get(url, timeout = 0.9)
-        printCommandLog("show gameStat --LOL(Function)", "RUNNING", "Getting LOL Statistics.. username : " + username)
+        printCommandLog(fromWho, "show gameStat --LOL --username {}(Function)".format(username), "RUNNING", "Getting LOL Statistics.. username : " + username)
     except:
         USERNAME = 404              # username을 통해 함수 실행 실패를 알려줌(응답이 제 시간 내 돌아오지 않는 경우)
         return 404
@@ -98,18 +98,27 @@ def getLOLUserStatistics(username):
             
 
         ##################################################################################
+
+        resultForPrintCommandLog = "{} | {} | {} | {} | {} | {} | {} | {} | {} | {}".format(USERNAME, USERLEVEL, USER_PROFILE_PICTURE, USERRANK, TIER_SYMBOL_PIC_URL, TIER_SOLO_RANK_STEP, TIER_SOLO_LEAGUE_POINT, TIER_SOLO_GAME_PLAY_WIN, TIER_SOLO_GAME_PLAY_LOSE, TIER_SOLO_GAME_WINNING_RATIO)
+        printCommandLog(fromWho, "show gameStat --LOL --username {}(Function)".format(username), "RUNNING", resultForPrintCommandLog)
+
         _END_TIME = time.time()
         running_time = round((_END_TIME - _START_TIME), 4)
-        printCommandLog("show gameStat --LOL(Function)", "RUNNING", "running time : " + str(running_time) + " sec/pass")
+        printCommandLog(fromWho, "show gameStat --LOL --username {}(Function)".format(username), "RUNNING", "running time : " + str(running_time) + " sec/pass")
+
 
         return str(USERNAME), str(USERLEVEL), str(USER_PROFILE_PICTURE), str(USERRANK), str(TIER_SYMBOL_PIC_URL), str(TIER_SOLO_RANK_STEP), str(TIER_SOLO_LEAGUE_POINT), str(TIER_SOLO_GAME_PLAY_WIN), str(TIER_SOLO_GAME_PLAY_LOSE), str(TIER_SOLO_GAME_WINNING_RATIO), str(running_time)
 
     except:
-        printCommandLog("show gameStat --LOL(Function)", "FAILED", "UNEXPECTED_DATA_RECEIVED")
+        printCommandLog(fromWho, "show gameStat --LOL --username {}(Function)".format(username), "FAILED", "UNEXPECTED_DATA_RECEIVED")
         return 403, 403, 403, 403, 403, 403, 403, 403, 403, 403
 
+# def getLOLTeamfightTactisStatistics(fromWho, username):
 
-# print(getLOLUserStatistics("오리 빵빵댕이"))
+
+
+getLOLUserStatistics("EXAMPLE", "라키주작")
+# getLOLUserStatistics("EXAMPLE","오리 빵빵댕이")
 # print(getLOLUserStatistics("DRX Decky"))
 # print(getLOLUserStatistics("해리포비"))
 # print(getLOLUserStatistics("INVALID_TEST_123asdf!@#!@@"))

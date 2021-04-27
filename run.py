@@ -65,6 +65,7 @@ async def show(ctx, *option):
         embed.add_field(name = "```random``` 계열 명령어", value = 
                 '''
                 지정한 범위 내에서 랜덤 숫자 출력하기```random --start [시작숫자] --end [끝 숫자]```
+                로또 번호 추첨 ```random --drawTheLotto```
                 주사위 굴리기(1 ~ 6)```random --rollthedice```
                 영숫자 혼합 난수 생성하기```random --getAlphanumeric --length [길이(1~256)]```
                 16진수 난수 생성하기```random --getHexadecimal --length [길이(1~256)]```
@@ -86,7 +87,7 @@ async def show(ctx, *option):
 
         if len(option) == 4:
 
-            USERNAME, USERLEVEL, USER_PROFILE_PICTURE, USERRANK, TIER_SYMBOL_PIC_URL, TIER_SOLO_RANK_STEP, TIER_SOLO_LEAGUE_POINT, TIER_SOLO_GAME_PLAY_WIN, TIER_SOLO_GAME_PLAY_LOSE, TIER_SOLO_GAME_WINNING_RATIO, running_time = COMMAND_SHOW_EX_.getGameStatistics.getLOLUserStatistics(str(option[3]))
+            USERNAME, USERLEVEL, USER_PROFILE_PICTURE, USERRANK, TIER_SYMBOL_PIC_URL, TIER_SOLO_RANK_STEP, TIER_SOLO_LEAGUE_POINT, TIER_SOLO_GAME_PLAY_WIN, TIER_SOLO_GAME_PLAY_LOSE, TIER_SOLO_GAME_WINNING_RATIO, running_time = COMMAND_SHOW_EX_.getGameStatistics.getLOLUserStatistics(ctx.author.name, str(option[3]))
             print(USERNAME)
             if USERNAME == 404:
                 embed = discord.Embed(title = "No Response Exception", description = "현재 전적 조회소 op.gg 에서 응답이 Timeout 내에 돌아오지 않고 있습니다.\n요청을 단기간에 과도하게 보내지 마시고, 잠시 후 다시 시도하세요.", color = 0xff0000)
@@ -111,6 +112,7 @@ async def show(ctx, *option):
             embed.add_field(name = "티어 등급", value = TIER_SOLO_RANK_STEP, inline = True)
             embed.add_field(name = "LP", value = TIER_SOLO_LEAGUE_POINT, inline = True)
             embed.add_field(name = "승리 / 패배", value = TIER_SOLO_GAME_PLAY_WIN + " / " + TIER_SOLO_GAME_PLAY_LOSE + " ( 승률 : " + TIER_SOLO_GAME_WINNING_RATIO + " )" , inline = True)
+            embed.set_image(url = "https://i.imgur.com/GClp1fh.png")
             # embed.set_image(url = TIER_SYMBOL_PIC_URL)
 
             embed.set_footer(text="Lumibot | From {}({}) | Run Time : {} sec | 전적의 모든 랭킹 관련 결과는 솔로 랭크 자료입니다.".format(ctx.message.author.name, ctx.author.display_name, running_time), icon_url = ctx.author.avatar_url)
@@ -136,7 +138,7 @@ async def show(ctx, *option):
                 printCommandLog(ctx.author.name, "show crypto --symbol {}".format(str(option[2])), "FAILED", "NO_LISTED_CRYPTO_TRIAL")
 
             #(cryptocurrency_KRname, cryptocurrency_to_KRW, cryptocurrency_change_KRW, cryptocurrency_change_PERCENT, cryptocurrency_transaction_KRW, cryptocurrency_transaction_CRYPTO, running_time) = COMMAND_SHOW_EX_.getCryptocurrencyInfo.getCryptocurrencyInfo(str(option[2]))
-            CRYPTO_KR_NAME, CURRENT_CRYPTO_VALUE_KRW, CURRENT_CRYPTO_VALUE_OPENING_00h, CURRENT_CRYPTO_VALUE_MIN_00h, CURRENT_CRYPTO_VALUE_MAX_00h, CURRENT_CRYPTO_UNIT_TRADE_24h, CURRENT_CRYPTO_KRW_TRADE_24h, CURRENT_CRYPTO_KRW_CHANGE_24h, CURRENT_CRYPTO_PERCENT_CHANGE_24h, CURRENT_UPDATE_TIME, _RUNNING_TIME, CURRENT_CRYPTO_CHANGE_EMOJI, CRYPTO_PICTURE_URL = COMMAND_SHOW_EX_.getCryptocurrencyInfo.getCryptocurrencyInfo(str(option[2]))
+            CRYPTO_KR_NAME, CURRENT_CRYPTO_VALUE_KRW, CURRENT_CRYPTO_VALUE_OPENING_00h, CURRENT_CRYPTO_VALUE_MIN_00h, CURRENT_CRYPTO_VALUE_MAX_00h, CURRENT_CRYPTO_UNIT_TRADE_24h, CURRENT_CRYPTO_KRW_TRADE_24h, CURRENT_CRYPTO_KRW_CHANGE_24h, CURRENT_CRYPTO_PERCENT_CHANGE_24h, CURRENT_UPDATE_TIME, _RUNNING_TIME, CURRENT_CRYPTO_CHANGE_EMOJI, CRYPTO_PICTURE_URL = COMMAND_SHOW_EX_.getCryptocurrencyInfo.getCryptocurrencyInfo(ctx.author.name, str(option[2]))
             if CRYPTO_KR_NAME == 404:
                 embed = discord.Embed(title = "No Response Exception", description = "현재 거래소에서 응답이 Timeout 내에 돌아오지 않고 있습니다.\n요청을 단기간에 과도하게 보내지 마시고, 잠시 후 다시 시도하세요.", color = 0xff0000)
                 embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
@@ -172,7 +174,7 @@ async def show(ctx, *option):
     elif option[0] == "crypto" and option[1] == "--brief":      # 암호화폐 시장 요약
         
         if len(option) == 2:
-            allMarketCap, dayCryptoVolume, allCryptoQuantity, allCryptoExchanges, running_time = COMMAND_SHOW_EX_.getCryptocurrencyInfo.getCryptocurrencyBrief()
+            allMarketCap, dayCryptoVolume, allCryptoQuantity, allCryptoExchanges, running_time = COMMAND_SHOW_EX_.getCryptocurrencyInfo.getCryptocurrencyBrief(ctx.message.author.name)
 
             if allMarketCap == 404:     # 정보 받아오기 실패
                 embed = discord.Embed(title = "No Response Exception", description = "현재 Coinranking 측에서 응답이 Timeout 내에 돌아오지 않고 있습니다.\n요청을 단기간에 과도하게 보내지 마시고, 잠시 후 다시 시도하세요.", color = 0xff0000)
@@ -204,7 +206,7 @@ async def show(ctx, *option):
                 printCommandLog(ctx.author.name, "show stock --search {}".format(str(option[2])), "FAILED", "NO_LISTED_COMPANY_TRIAL")
 
             embed = discord.Embed(title = option[2] + " 주식 정보", description = "금융 정보 제공 : 다음 금융",  timestamp=datetime.datetime.utcnow(), color = 0xeaf27c)
-            (symbolCode, companyName, tradePrice, changePrice, changeRate, marketCap, running_time) = COMMAND_SHOW_EX_.getStockInfo.getStockInfo(str(option[2]))
+            (symbolCode, companyName, tradePrice, changePrice, changeRate, marketCap, running_time) = COMMAND_SHOW_EX_.getStockInfo.getStockInfo(ctx.author.name, str(option[2]))
 
             if symbolCode == 404:
                 embed = discord.Embed(title = "No Response Exception", description = "현재 금융 페이지에서 응답이 Timeout 내에 돌아오지 않고 있습니다.\n요청을 단기간에 과도하게 보내지 마시고, 잠시 후 다시 시도하세요.", color = 0xff0000)
@@ -342,6 +344,12 @@ async def random(ctx, *option):
         embed.add_field(name = "범위 내 난수 생성", value = "결과 : " + str(result), inline = False)
         printCommandLog(ctx.author.name, "random --start {} --end {}".format(str(option[1]), str(option[3])), "OK", str(result))
 
+    elif option[0] == "--drawTheLotto":
+        result = COMMAND_RANDOM_.randomToolBox.getLottoNumberPick()
+
+        embed.add_field(name = "로또 번호 추첨", value = result, inline = False)
+        printCommandLog(ctx.author.name, "random --drawTheLotto", "OK", str(result))
+
     elif option[0] == "--rollthedice":
         result = COMMAND_RANDOM_.randomToolBox.diceroll()
         embed.add_field(name = "주사위를 굴립니다... :game_die:", value = str(result) + " 이(가) 나왔습니다.", inline = False)
@@ -398,4 +406,4 @@ async def on_command_error(ctx, error):
     	#await ctx.send("명령어를 찾지 못했습니다")
         
 # ENTER_MY_OWN_DISCORD_BOT_TOKEN
-bot.run('# ENTER_MY_OWN_DISCORD_BOT_TOKEN') #토큰
+bot.run('ODMyNTcyNDY2MzU4Mzg2Njg5.YHlviA.e9lKQ49WJ4DFOX6rWm0XKtS3lOk') #토큰

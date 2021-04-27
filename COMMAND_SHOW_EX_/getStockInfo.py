@@ -18,7 +18,7 @@ from resource.sub_function_used_globally.printCommandLog import printCommandLog 
 ############################################################################
 
 
-def getStockInfo(companyName):
+def getStockInfo(fromWho, companyName):
 
     _START_TIME = time.time()
 
@@ -27,7 +27,7 @@ def getStockInfo(companyName):
 
     try:
         companyCode = getStockCode(companyName)
-        printCommandLog("show stock --search {} (Function)".format(companyName), "RUNNING", "Getting Stock Information : " + companyName)
+        printCommandLog(fromWho, "show stock --search {} (Function)".format(companyName), "RUNNING", "Getting Stock Information : " + companyName)
         #print("getting information about : " + companyName)
 
         url = "https://finance.daum.net/api/quote/A" + companyCode + "/sectors"
@@ -69,9 +69,13 @@ def getStockInfo(companyName):
     marketCap = str(stockData[0][0].get("marketCap")).replace('.0','')     # 시가총액
     marketCap = "≈ " + getWonwhaString.getWonhwaString(int(marketCap)) + " 원"     
 
+    resultForPrintCommandLog = "RESULT > {} | {} | {} | {} | {} | {}".format(symbolCode, companyName, tradePrice, changePrice, changeRate, marketCap)
+    printCommandLog(fromWho, "show stock --search {}(Function)".format(companyName), "RUNNING", resultForPrintCommandLog)
+    
+
     _END_TIME = time.time()
     running_time = round((_END_TIME - _START_TIME), 4)
-    printCommandLog("show stock --search {}(Function)".format(companyName), "RUNNING", "running time : " + str(running_time) + " sec/pass")
+    printCommandLog(fromWho, "show stock --search {}(Function)".format(companyName), "RUNNING", "running time : " + str(running_time) + " sec/pass")
     #print("running time : ", str(running_time) + " SEC.")
 
     return symbolCode, companyName, tradePrice, changePrice, changeRate, marketCap, str(running_time)
@@ -95,20 +99,20 @@ def getStockCode(companyName):
 
     return code
 
-# print(getStockInfo("삼성전자"))
-# print(getStockInfo("LG"))
-# print(getStockInfo("CJ대한통운"))
-# print(getStockInfo("카카오"))
-# print(getStockInfo("BGF리테일"))
-# print(getStockInfo("CJ제일제당"))
-# print(getStockInfo("대한항공"))
-# print(getStockInfo("롯데제과"))
-# print(getStockInfo("이트론"))
-# print(getStockInfo("씨젠"))
-# print(getStockInfo("아모레퍼시픽"))
-# print(getStockInfo("엔씨소프트"))
-# print(getStockInfo("한국전력"))
-# print(getStockInfo("삼성생명"))
-# print(getStockInfo("KT"))
-# print(getStockInfo("넷마블"))
-# print(getStockInfo("기업은행"))
+# print(getStockInfo("fromWhoExample123", "삼성전자"))
+# print(getStockInfo("fromWhoExample123", "LG"))
+# print(getStockInfo("fromWhoExample123", "CJ대한통운"))
+# print(getStockInfo("fromWhoExample123", "카카오"))
+# print(getStockInfo("fromWhoExample123", "BGF리테일"))
+# print(getStockInfo("fromWhoExample123", "CJ제일제당"))
+# print(getStockInfo("fromWhoExample123", "대한항공"))
+# print(getStockInfo("fromWhoExample123", "롯데제과"))
+# print(getStockInfo("fromWhoExample123", "이트론"))
+# print(getStockInfo("fromWhoExample123", "씨젠"))
+# print(getStockInfo("fromWhoExample123", "아모레퍼시픽"))
+# print(getStockInfo("fromWhoExample123", "엔씨소프트"))
+# print(getStockInfo("fromWhoExample123", "한국전력"))
+# print(getStockInfo("fromWhoExample123", "삼성생명"))
+# print(getStockInfo("fromWhoExample123", "KT"))
+# print(getStockInfo("fromWhoExample123", "넷마블"))
+# print(getStockInfo("fromWhoExample123", "기업은행"))

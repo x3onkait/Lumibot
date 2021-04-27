@@ -20,7 +20,7 @@ from resource.sub_function_used_globally.printCommandLog import printCommandLog 
 from resource.sub_function_used_globally import getWonwhaString
 ##################################################################################################
 
-def getCryptocurrencyInfo(symbol):
+def getCryptocurrencyInfo(fromWho, symbol):
 
     _START_TIME = time.time()       # 함수 퍼포먼스(작동 시간) 측정
 
@@ -31,16 +31,16 @@ def getCryptocurrencyInfo(symbol):
     CRYPTO_PICTURE_URL = getCryptocurrencyURL(symbol)
     
     if CRYPTO_KR_NAME == 404:        # 항목 없음 에러 코드
-        printCommandLog("show crypto --symbol {} (Function)".format(symbol), "FAILED", "UNAVAILABLE_CRYPTO_REQUEST")
+        printCommandLog(fromWho, "show crypto --symbol {} (Function)".format(symbol), "FAILED", "UNAVAILABLE_CRYPTO_REQUEST")
         return 404                              # 함수 종료
 
     if CRYPTO_PICTURE_URL == 404:
-        printCommandLog("show crypto --symbol {} (Function)".format(symbol), "RUNNING", "NO_CRYPTO_LOGO_PIC_SKIPPED")
+        printCommandLog(fromWho, "show crypto --symbol {} (Function)".format(symbol), "RUNNING", "NO_CRYPTO_LOGO_PIC_SKIPPED")
         CRYPTO_PICTURE_URL = 404
 
     try:
         response = requests.get(url, timeout=0.9)
-        printCommandLog("show crypto --symbol {} (Function)".format(symbol), "RUNNING", "Getting Stock Information : " + symbol)
+        printCommandLog(fromWho, "show crypto --symbol {} (Function)".format(symbol), "RUNNING", "Getting Stock Information : " + symbol)
     except:
         return 404
 
@@ -105,24 +105,25 @@ def getCryptocurrencyInfo(symbol):
         CURRENT_UPDATE_TIME = datetime.datetime.fromtimestamp(CURRENT_UPDATE_TIME).strftime('%Y년 %m월 %d일 %H시 %M분 %S.%f초').replace('000','')
         #print("업데이트 시간 : " + CURRENT_UPDATE_TIME)
 
+        resultForPrintCommandLog = "RESULT > {} | {} | {} | {} | {} | {} | {} | {} | {} | {}".format(CRYPTO_KR_NAME, CURRENT_CRYPTO_VALUE_KRW, CURRENT_CRYPTO_VALUE_OPENING_00h, CURRENT_CRYPTO_VALUE_MIN_00h, CURRENT_CRYPTO_VALUE_MAX_00h, CURRENT_CRYPTO_UNIT_TRADE_24h, CURRENT_CRYPTO_KRW_TRADE_24h, CURRENT_CRYPTO_KRW_CHANGE_24h, CURRENT_CRYPTO_PERCENT_CHANGE_24h, CURRENT_UPDATE_TIME)
+        printCommandLog(fromWho, "show crypto --symbol {} (Function)".format(symbol), "RUNNING", resultForPrintCommandLog)
+
         _END_TIME = time.time()
         running_time = round((_END_TIME - _START_TIME), 4)
-        printCommandLog("show crypto --symbol {} (Function)".format(symbol), "RUNNING", "running time : " + str(running_time) + " sec/pass")
-        # print("작동 시간 : " + _RUNNING_TIME + " 초")
-
-        #print()
+        printCommandLog(fromWho, "show crypto --symbol {} (Function)".format(symbol), "RUNNING", "running time : " + str(running_time) + " sec/pass")
 
         # str()을 하지 않으면 Discord Embed에서 출력이 제대로 되지 않을 수 있다. 
+
         return str(CRYPTO_KR_NAME), str(CURRENT_CRYPTO_VALUE_KRW), str(CURRENT_CRYPTO_VALUE_OPENING_00h), str(CURRENT_CRYPTO_VALUE_MIN_00h), str(CURRENT_CRYPTO_VALUE_MAX_00h), str(CURRENT_CRYPTO_UNIT_TRADE_24h), str(CURRENT_CRYPTO_KRW_TRADE_24h), str(CURRENT_CRYPTO_KRW_CHANGE_24h), str(CURRENT_CRYPTO_PERCENT_CHANGE_24h), str(CURRENT_UPDATE_TIME), str(running_time), str(CURRENT_CRYPTO_CHANGE_EMOJI), str(CRYPTO_PICTURE_URL)
 
-def getCryptocurrencyBrief():
+def getCryptocurrencyBrief(fromWho):
     _START_TIME = time.time()       # 함수 퍼포먼스(작동 시간) 측정
 
     url = "https://coinranking.com/overview"
 
     try:
         response = requests.get(url, timeout = 1)
-        printCommandLog("show crypto --brief(Function)", "RUNNING", "Getting Brief Information")
+        printCommandLog(fromWho, "show crypto --brief(Function)", "RUNNING", "Getting Brief Information")
     except:
         allMarketCap = 404              # 일종의 비표 역할. 실패할 경우 이 데이터가 실패를 알림.
         return 404
@@ -149,13 +150,14 @@ def getCryptocurrencyBrief():
         allCryptoExchanges = allCryptoExchanges.get_text().strip() + " 개"
         #print(allCryptoExchanges)
 
+        resultForPrintCommandLog = "RESULT > {} | {} | {} | {}".format(allMarketCap, dayCryptoVolume, allCryptoQuantity, allCryptoExchanges)
+        printCommandLog(fromWho, "show crypto --brief(Function)", "RUNNING", resultForPrintCommandLog)
+
         _END_TIME = time.time()
         running_time = round((_END_TIME - _START_TIME), 4)
-        printCommandLog("show crypto --brief(Function)", "RUNNING", "running time : " + str(running_time) + " sec/pass")
+        printCommandLog(fromWho, "show crypto --brief(Function)", "RUNNING", "running time : " + str(running_time) + " sec/pass")
 
         return str(allMarketCap), str(dayCryptoVolume), str(allCryptoQuantity), str(allCryptoExchanges), str(running_time)
-
-
 
 def getNameFromCryptoSymbol(symbol):
 
@@ -200,20 +202,7 @@ def getCryptocurrencyURL(symbol):
 
 # print(getCryptocurrencyBrief())
 
-# print(getCryptocurrencyInfo("LF"))
-# print(getCryptocurrencyInfo("BTC"))
+# getCryptocurrencyInfo("FromWhoExampleTest123", "LF")
+# getCryptocurrencyBrief("FromWhoExampleTest123")
 
-# print(getCryptocurrencyInfo("VET"))
-# print(getCryptocurrencyInfo("BTC"))
-# print(getCryptocurrencyInfo("XRP"))
-# print(getCryptocurrencyInfo("ETC"))
-# print(getCryptocurrencyInfo("MKR"))
-# print(getCryptocurrencyInfo("ETH"))
-# print(getCryptocurrencyInfo("BCH"))
-# print(getCryptocurrencyInfo("CMP"))
-# print(getCryptocurrencyInfo("AAVE"))
-# print(getCryptocurrencyInfo("BSV"))
-# print(getCryptocurrencyInfo("LTC"))
-# print(getCryptocurrencyInfo("BTG"))
-# print(getCryptocurrencyInfo("INVALID_TEST"))
 
