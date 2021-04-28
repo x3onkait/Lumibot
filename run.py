@@ -11,7 +11,7 @@ import COMMAND_SHOW_EX_.getCryptocurrencyInfo       # 암호화폐 정보
 import COMMAND_SHOW_EX_.getStockInfo                # 주식 정보
 import COMMAND_SHOW_EX_.getCurrentTime              # 현재 시간 정보
 import COMMAND_SHOW_EX_.getWorldPopulation          # 인구 정보
-import COMMAND_SHOW_EX_.getGameStatistics           # 게임 전적 정보
+import COMMAND_SHOW_EX_.getGame_LOL_Statistics           # 게임 전적 정보
 
 import COMMAND_RANDOM_.randomToolBox        # 난수 관련
 import COMMAND_CALCULATE_.calculator        # 계산기 역할을 하는 다양한 모듈들
@@ -87,33 +87,63 @@ async def show(ctx, *option):
 
         if len(option) == 4:
 
-            USERNAME, USERLEVEL, USER_PROFILE_PICTURE, USERRANK, TIER_SYMBOL_PIC_URL, TIER_SOLO_RANK_STEP, TIER_SOLO_LEAGUE_POINT, TIER_SOLO_GAME_PLAY_WIN, TIER_SOLO_GAME_PLAY_LOSE, TIER_SOLO_GAME_WINNING_RATIO, running_time = COMMAND_SHOW_EX_.getGameStatistics.getLOLUserStatistics(ctx.author.name, str(option[3]))
-            print(USERNAME)
-            if USERNAME == 404:
-                embed = discord.Embed(title = "No Response Exception", description = "현재 전적 조회소 op.gg 에서 응답이 Timeout 내에 돌아오지 않고 있습니다.\n요청을 단기간에 과도하게 보내지 마시고, 잠시 후 다시 시도하세요.", color = 0xff0000)
+            OVERALL_FUNCTION_RETURN, COMMON_USER_INFO, USERSOLORANK_INFO, USERFREERANK_INFO, GAMEPLAY_STATUS, running_time = COMMAND_SHOW_EX_.getGame_LOL_Statistics.getLOLUserStatistics(ctx.author.name, str(option[3]))
+
+            if OVERALL_FUNCTION_RETURN == 408:
+                embed = discord.Embed(title = "No Response Exception", description = "현재 전적 조회소 poro.gg 에서 응답이 Timeout 내에 돌아오지 않고 있습니다.\n요청을 단기간에 과도하게 보내지 마시고, 잠시 후 다시 시도하세요.", color = 0xff0000)
                 embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
                 await ctx.send(embed = embed)
                 printCommandLog(ctx.author.name, "show gameStat --LOL --username {}".format(str(option[3])), "FAILED", "NO_RESPONSE_RETURNED")
 
-            elif USERNAME == 403:
-                embed = discord.Embed(title = "No Expected Data Received", description = "제대로 된 데이터가 op.gg에서 오지 않았습니다\n오타가 입력되었을 가능성이 매우 높으니 입력값을 다시 한번 확인해주세요.", color = 0xff0000)
+            elif OVERALL_FUNCTION_RETURN == 404:
+                embed = discord.Embed(title = "No Expected Data Received", description = "제대로 된 데이터가 poro.gg에서 오지 않았습니다\n오타가 입력되었을 가능성이 매우 높으니 입력값을 다시 한번 확인해주세요.", color = 0xff0000)
                 embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
                 await ctx.send(embed = embed)
                 printCommandLog(ctx.author.name, "show gameStat --LOL --username {}".format(str(option[3])), "FAILED", "NO_EXPECTED_DATA_RECEIVED")
             
             printCommandLog(ctx.author.name, "show gameStat --LOL --username {}".format(str(option[3])), "RUNNING", "INIT_GET_INFO_PHASE")
-            embed = discord.Embed(title = "리그 오브 레전드 전적 조회", description = "정보 제공 : OP.GG", timestamp=datetime.datetime.utcnow(), color = 0x307c70)
+            
+            embed = discord.Embed(title = "리그 오브 레전드 전적 조회", description = "정보 제공 : poro.gg", timestamp=datetime.datetime.utcnow(), color = 0x307c70)
 
-            embed.set_thumbnail(url = USER_PROFILE_PICTURE)
-            embed.set_author(name = " : @{}".format(USERNAME), url = TIER_SYMBOL_PIC_URL, icon_url = TIER_SYMBOL_PIC_URL)
-            embed.add_field(name = "유저 이름", value = USERNAME, inline = True)
-            embed.add_field(name = '유저 레벨', value = USERLEVEL, inline = True)
-            embed.add_field(name = "유저 랭킹 현황", value = USERRANK, inline = True)
-            embed.add_field(name = "티어 등급", value = TIER_SOLO_RANK_STEP, inline = True)
-            embed.add_field(name = "LP", value = TIER_SOLO_LEAGUE_POINT, inline = True)
-            embed.add_field(name = "승리 / 패배", value = TIER_SOLO_GAME_PLAY_WIN + " / " + TIER_SOLO_GAME_PLAY_LOSE + " ( 승률 : " + TIER_SOLO_GAME_WINNING_RATIO + " )" , inline = True)
-            embed.set_image(url = "https://i.imgur.com/GClp1fh.png")
-            # embed.set_image(url = TIER_SYMBOL_PIC_URL)
+            embed.set_thumbnail(url = COMMON_USER_INFO[2])
+
+            embed.set_author(name = " : @{}".format(COMMON_USER_INFO[1]), url = USERSOLORANK_INFO[0], icon_url = USERSOLORANK_INFO[0])
+            embed.add_field(name = "기본 정보", value = 
+            '''
+            랭킹 현황 : **{}**
+            유저 이름 : **{}**
+            유저 레벨 : **{}**
+            '''.format(COMMON_USER_INFO[0], COMMON_USER_INFO[1], COMMON_USER_INFO[3]), inline = False)
+            embed.add_field(name = "솔로 랭크 통계", value = 
+            '''
+            랭크 : **{}**
+            리그 포인트 : **{}**
+            승률 : **{}** {}
+            '''.format(USERSOLORANK_INFO[1], USERSOLORANK_INFO[2], USERSOLORANK_INFO[3], USERSOLORANK_INFO[4]), inline = True)
+            embed.add_field(name = "자유 랭크 통계", value = 
+            '''
+            랭크 : **{}**
+            리그 포인트 : **{}**
+            승률 : **{}** {}
+            '''.format(USERFREERANK_INFO[1], USERFREERANK_INFO[2], USERFREERANK_INFO[3], USERFREERANK_INFO[4]), inline = True)
+            embed.add_field(name = "최근 게임 플레이 분석", value = 
+            '''
+            최근 플레이한 게임 : **{}**
+            이긴 게임 / 진 게임 : **{}** / **{}**
+            게임당 평균 KILL : **{}**
+            게임당 평균 DEATH : **{}**
+            게임당 평균 ASSIST : **{}**
+            __게임당 평균 KDA : **{}**__
+            퍼펙트 KDA(퍼펙트 평점) : **{}**
+            게임당 평균 멀티킬 : **{}**
+            게임당 평균 킬관여 : **{}**
+            게임당 평균 와드 설치수 : **{}**
+            게임당 평균 와드 파괴수 : **{}**
+            게임당 평균 CS : **{}**
+            '''.format(GAMEPLAY_STATUS[0], GAMEPLAY_STATUS[1], GAMEPLAY_STATUS[2], GAMEPLAY_STATUS[3], GAMEPLAY_STATUS[4],
+                        GAMEPLAY_STATUS[5], GAMEPLAY_STATUS[6], GAMEPLAY_STATUS[7], GAMEPLAY_STATUS[8], GAMEPLAY_STATUS[9],
+                        GAMEPLAY_STATUS[10], GAMEPLAY_STATUS[11], GAMEPLAY_STATUS[12]), inline = False)
+            # embed.set_image(url = "https://i.imgur.com/GClp1fh.png")
 
             embed.set_footer(text="Lumibot | From {}({}) | Run Time : {} sec | 전적의 모든 랭킹 관련 결과는 솔로 랭크 자료입니다.".format(ctx.message.author.name, ctx.author.display_name, running_time), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
@@ -406,4 +436,4 @@ async def on_command_error(ctx, error):
     	#await ctx.send("명령어를 찾지 못했습니다")
         
 # ENTER_MY_OWN_DISCORD_BOT_TOKEN
-bot.run('ODMyNTcyNDY2MzU4Mzg2Njg5.YHlviA.e9lKQ49WJ4DFOX6rWm0XKtS3lOk') #토큰
+bot.run('ODMyNTcyNDY2MzU4Mzg2Njg5.YHlviA.3bR58BwDcjtOHoqsV5bxPrmWccY') #토큰

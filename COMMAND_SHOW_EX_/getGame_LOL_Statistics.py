@@ -80,7 +80,6 @@ def getLOLUserStatistics(fromWho, username):
                 # 티어 이름
                 USERSOLORANK_TIER_NAME = USERSOLORANK_TIER_LP_MIX[0:-2]
                 USERSOLORANK_TIER_NAME = " ".join(USERSOLORANK_TIER_NAME)
-                USERSOLORANK_TIER_NAME = "**" + USERSOLORANK_TIER_NAME + "**"
 
                 # LP 점수
                 USERSOLORANK_TIER_LP = USERSOLORANK_TIER_LP_MIX[-2:]
@@ -115,7 +114,6 @@ def getLOLUserStatistics(fromWho, username):
                 # 티어 이름
                 USERFREERANK_TIER_NAME = USERFREERANK_TIER_LP_MIX[0:-2]
                 USERFREERANK_TIER_NAME = " ".join(USERFREERANK_TIER_NAME)
-                USERFREERANK_TIER_NAME = "**" + USERFREERANK_TIER_NAME + "**"
 
                 # LP 점수
                 USERFREERANK_TIER_LP = USERFREERANK_TIER_LP_MIX[-2:]
@@ -255,10 +253,14 @@ def getLOLUserStatistics(fromWho, username):
 
     ##################################################################################################################################
     
-    return OVERALL_FUNCTION_RETURN, COMMON_USER_INFO, USERSOLORANK_INFO, USERFREERANK_INFO, GAMEPLAY_STATUS
+    _END_TIME = time.time()
+    running_time = round((_END_TIME - _START_TIME), 4)
+    printCommandLog(fromWho, "show gameStat --LOL --username {}(Function)".format(username), "RUNNING", "running time : " + str(running_time) + " sec/pass")
+
+    return OVERALL_FUNCTION_RETURN, COMMON_USER_INFO, USERSOLORANK_INFO, USERFREERANK_INFO, GAMEPLAY_STATUS, running_time
                 
 
 
-# print(getLOLUserStatistics("EXAMPLE", "라키주작"))
 # print(getLOLUserStatistics("EXAMPLE", "미친개 정강지"))
-# getLOLUserStatistics("EXAMPLE", "사거리 계산")
+# print(getLOLUserStatistics("EXAMPLE", "라키주작"))
+# print(getLOLUserStatistics("EXAMPLE", "사거리 계산"))
