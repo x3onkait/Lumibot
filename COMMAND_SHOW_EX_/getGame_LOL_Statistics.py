@@ -16,7 +16,26 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from resource.sub_function_used_globally.printCommandLog import printCommandLog as printCommandLog
 ######################################################################################
 
-import time
+import time, datetime
+
+# GAMEPLAY_STATUS의 인덱스 명을 보다 쉽게 알아보기 위해 ENUM 클래스 선언
+from enum import Enum
+
+class GAMEPLAY_STATUS_INDEX(Enum):
+
+    GAMEPLAY_TOTAL = 0
+    GAMEPLAY_WIN = 1
+    GAMEPLAY_LOSE = 2
+    GAMEPLAY_KILLS = 3
+    GAMEPLAY_DEATH = 4
+    GAMEPLAY_ASSISTS = 5
+    GAMEPLAY_KDA = 6
+    GAMEPLAY_MULTI_KILLS = 7
+    GAMEPLAY_KILL_PARTICIPATION = 8
+    GAMEPLAY_WARDS_PLACED = 9
+    GAMEPLAY_WARDS_DESTROYED = 10
+    GAMEPLAY_AVERAGE_TIME = 11
+    GAMEPLAY_CS_PER_MIN = 12
 
 def getLOLUserStatistics(fromWho, username):
 
@@ -160,19 +179,21 @@ def getLOLUserStatistics(fromWho, username):
         sequence = 0            # 통계 번호
 
         # 통계 산출
-        GAMEPLAY_TOTAL = 0
-        GAMEPLAY_WIN = 0
-        GAMEPLAY_LOSE = 0
-        GAMEPLAY_KILLS = 0
-        GAMEPLAY_DEATH = 0
-        GAMEPLAY_ASSISTS = 0
-        GAMEPLAY_KDA = 0
-        GAMEPLAY_KDA_PERFECT = 0
-        GAMEPLAY_MULTI_KILLS = 0
-        GAMEPLAY_KILL_PARTICIPATION = 0
-        GAMEPLAY_WARDS_PLACED = 0
-        GAMEPLAY_KILLED = 0
-        GAMEPLAY_CS = 0
+        # 일단 모두 합산한 다음 변량의 개수로 나누어 평균 산출
+        GAMEPLAY_TOTAL = 0                  # 변량(게임 플레이 횟수)
+        GAMEPLAY_WIN = 0                    # 변량 중 이긴 게임 횟수(is_win = true 플래그)
+        GAMEPLAY_LOSE = 0                   # 변량 중 진 게임 횟수(is_win = false 플래그)
+        GAMEPLAY_KILLS = 0                  # KILL 수
+        GAMEPLAY_DEATH = 0                  # DEATH 수
+        GAMEPLAY_ASSISTS = 0                # ASSIST 수
+        GAMEPLAY_KDA = 0                    # KILL-DEATH-ASSIST수 (산출 : [KILL + ASSIST] / DEATH)
+        #GAMEPLAY_KDA_PERFECT = 0           # 퍼펙트 KDA(Death = 0일때) 별로 의미 없는 지표라서 삭제함
+        GAMEPLAY_MULTI_KILLS = 0            # 멀티킬 횟수
+        GAMEPLAY_KILL_PARTICIPATION = 0     # 킬관여율(할푼리 방식, 0.xxx)
+        GAMEPLAY_WARDS_PLACED = 0           # 설치한 와드 수
+        GAMEPLAY_WARDS_DESTROYED = 0        # 파괴한 와드 수
+        GAMEPLAY_CS = 0                     # CS(미니언 킬)
+        GAMEPLAY_DURATION = 0               # 게임 진행 시간(초 단위)
 
         while True:
             try:
@@ -199,8 +220,8 @@ def getLOLUserStatistics(fromWho, username):
                 GAMEPLAY_KDA += (((int(GAMEPLAY_INFO_MIX[sequence]['participant']['kills'])) + int(GAMEPLAY_INFO_MIX[sequence]['participant']['deaths'])) 
                                     / int(GAMEPLAY_INFO_MIX[sequence]['participant']['assists']))
                                 # 만약 Death 전적이 없는 경우는 Perfect 평점으로 추가 기록
-                if "Perfect" == str(GAMEPLAY_INFO_MIX[sequence]['participant']['kda']):
-                    GAMEPLAY_KDA_PERFECT += 1
+                # if "Perfect" == str(GAMEPLAY_INFO_MIX[sequence]['participant']['kda']):
+                #     GAMEPLAY_KDA_PERFECT += 1
 
                 # print(GAMEPLAY_INFO_MIX[sequence]['participant']['multi_kills'])           # 멀티킬
                 GAMEPLAY_MULTI_KILLS += int(GAMEPLAY_INFO_MIX[sequence]['participant']['multi_kills'])
@@ -213,10 +234,14 @@ def getLOLUserStatistics(fromWho, username):
                 GAMEPLAY_WARDS_PLACED += int(GAMEPLAY_INFO_MIX[sequence]['participant']['wards_placed'])
 
                 # print(GAMEPLAY_INFO_MIX[sequence]['participant']['wards_killed'])          # 와드 파괴수
-                GAMEPLAY_KILLED += int(GAMEPLAY_INFO_MIX[sequence]['participant']['wards_killed'])
+                GAMEPLAY_WARDS_DESTROYED += int(GAMEPLAY_INFO_MIX[sequence]['participant']['wards_killed'])
 
                 # print(GAMEPLAY_INFO_MIX[sequence]['participant']['cs'])                    # CS(미니언 킬)
+                # 게임당 CS가 아닌 분(minute)당 CS로 변경함
                 GAMEPLAY_CS += int(GAMEPLAY_INFO_MIX[sequence]['participant']['cs'])
+
+                # print(GAMEPLAY_INFO_MIX[sequence]['match']['game_duration'])               # 게임 플레이 시간(초)
+                GAMEPLAY_DURATION += int(GAMEPLAY_INFO_MIX[sequence]['match']['game_duration'])
 
                 sequence += 1
             except:
@@ -224,28 +249,44 @@ def getLOLUserStatistics(fromWho, username):
         
         # 정보 종합해서 리스트로 묶기
         GAMEPLAY_STATUS = [GAMEPLAY_TOTAL, GAMEPLAY_WIN, GAMEPLAY_LOSE, GAMEPLAY_KILLS, GAMEPLAY_DEATH, GAMEPLAY_ASSISTS,
-                    GAMEPLAY_KDA, GAMEPLAY_KDA_PERFECT, GAMEPLAY_MULTI_KILLS, GAMEPLAY_KILL_PARTICIPATION,
-                    GAMEPLAY_WARDS_PLACED, GAMEPLAY_KILLED, GAMEPLAY_CS]
+                    GAMEPLAY_KDA, GAMEPLAY_MULTI_KILLS, GAMEPLAY_KILL_PARTICIPATION,
+                    GAMEPLAY_WARDS_PLACED, GAMEPLAY_WARDS_DESTROYED]
 
         # print(GAMEPLAY_STATUS[0])
         # 플레이 횟수(전체 판수/이긴 판수/진 판수), KDA_PERFECT를 제외하고는 평균값을 산출한다.
         for _i in range(3, len(GAMEPLAY_STATUS)):
-            if _i == 7:     # KDA_PERFECT는 제외
-                continue
+            # if _i == 7:     # KDA_PERFECT는 제외
+            #     continue
             GAMEPLAY_STATUS[_i] = round((GAMEPLAY_STATUS[_i] / GAMEPLAY_STATUS[0]), 3)
+        
+        GAMEPLAY_DURATION /= GAMEPLAY_STATUS[0]         # 평균 시간도 리스트에는 아직 들어가 있지는 않지만 일단 평균을 산출한다.
+        GAMEPLAY_CS /= GAMEPLAY_STATUS[0]               # 게임당 CS도 리스트에는 아직 들어가 있지는 않지만 일단 평균을 산출한다.
 
         # 단위 붙이기, 후가공
-        GAMEPLAY_STATUS[0] = "{} 플레이".format(GAMEPLAY_STATUS[0])
-        GAMEPLAY_STATUS[1] = "{} 플레이".format(GAMEPLAY_STATUS[1])
-        GAMEPLAY_STATUS[2] = "{} 플레이".format(GAMEPLAY_STATUS[2])
-        GAMEPLAY_STATUS[3] = "{} 회".format(GAMEPLAY_STATUS[3])
-        GAMEPLAY_STATUS[4] = "{} 회".format(GAMEPLAY_STATUS[4])
-        GAMEPLAY_STATUS[5] = "{} 회".format(GAMEPLAY_STATUS[5])
-        GAMEPLAY_STATUS[8] = "{} 회".format(GAMEPLAY_STATUS[8])
-        GAMEPLAY_STATUS[9] = "{} %".format(GAMEPLAY_STATUS[9])
-        GAMEPLAY_STATUS[10] = "{} 개".format(GAMEPLAY_STATUS[10])
-        GAMEPLAY_STATUS[11] = "{} 개".format(GAMEPLAY_STATUS[11])
-        GAMEPLAY_STATUS[12] = "{} 점".format(GAMEPLAY_STATUS[12])
+        # Perfect KDA 항목 제거
+        GAMEPLAY_AVERAGE_TIME = str(datetime.timedelta(seconds = int(GAMEPLAY_DURATION)))   # 게임당 CS가 아닌 게임 시간 당 CS로 하는 것이 더 객관적이란 조언 반영
+        GAMEPLAY_CS_PER_MIN = round((GAMEPLAY_CS / (GAMEPLAY_DURATION / 60)), 3)            # 분당 평균 CS 계산
+
+
+        GAMEPLAY_STATUS.append(GAMEPLAY_AVERAGE_TIME)
+        GAMEPLAY_STATUS.append(GAMEPLAY_CS_PER_MIN)
+
+
+
+        GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_TOTAL.value] = "{} 플레이".format(GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_TOTAL.value])     
+        GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_WIN.value] = "{} 플레이".format(GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_WIN.value])     
+        GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_LOSE.value] = "{} 플레이".format(GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_LOSE.value])     
+        GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_KILLS.value] = "{} 회".format(GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_KILLS.value])         
+        GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_DEATH.value] = "{} 회".format(GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_DEATH.value])         
+        GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_ASSISTS.value] = "{} 회".format(GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_ASSISTS.value])
+        # ....... GAMEPLAY_KDA ........ (가공 없음)
+        # ....... GAMEPLAY_MULTI_KILLS ........ (가공 없음)
+        GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_KILL_PARTICIPATION.value] = "{} %".format(GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_KILL_PARTICIPATION.value])         
+        GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_WARDS_PLACED.value] = "{} 개".format(GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_WARDS_PLACED.value])         
+        GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_WARDS_DESTROYED.value] = "{} 개".format(GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_WARDS_DESTROYED.value])       
+        GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_AVERAGE_TIME.value] = "{}".format(GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_AVERAGE_TIME.value])
+        GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_CS_PER_MIN.value] = "{} point/min".format(GAMEPLAY_STATUS[GAMEPLAY_STATUS_INDEX.GAMEPLAY_CS_PER_MIN.value])
+
 
         OVERALL_FUNCTION_RETURN = 200
 

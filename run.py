@@ -116,7 +116,7 @@ async def show(ctx, *option):
             '''.format(COMMON_USER_INFO[0], COMMON_USER_INFO[1], COMMON_USER_INFO[3]), inline = False)
             embed.add_field(name = "솔로 랭크 통계", value = 
             '''
-            랭크 : **{}**
+            __랭크 : **{}**__
             리그 포인트 : **{}**
             승률 : **{}** {}
             '''.format(USERSOLORANK_INFO[1], USERSOLORANK_INFO[2], USERSOLORANK_INFO[3], USERSOLORANK_INFO[4]), inline = True)
@@ -134,12 +134,12 @@ async def show(ctx, *option):
             게임당 평균 DEATH : **{}**
             게임당 평균 ASSIST : **{}**
             __게임당 평균 KDA : **{}**__
-            퍼펙트 KDA(퍼펙트 평점) : **{}**
             게임당 평균 멀티킬 : **{}**
             게임당 평균 킬관여 : **{}**
             게임당 평균 와드 설치수 : **{}**
             게임당 평균 와드 파괴수 : **{}**
-            게임당 평균 CS : **{}**
+            게임당 평균 플레이 시간 : **{}**
+            __분당 평균 CS : **{}**__
             '''.format(GAMEPLAY_STATUS[0], GAMEPLAY_STATUS[1], GAMEPLAY_STATUS[2], GAMEPLAY_STATUS[3], GAMEPLAY_STATUS[4],
                         GAMEPLAY_STATUS[5], GAMEPLAY_STATUS[6], GAMEPLAY_STATUS[7], GAMEPLAY_STATUS[8], GAMEPLAY_STATUS[9],
                         GAMEPLAY_STATUS[10], GAMEPLAY_STATUS[11], GAMEPLAY_STATUS[12]), inline = False)
@@ -436,4 +436,4 @@ async def on_command_error(ctx, error):
     	#await ctx.send("명령어를 찾지 못했습니다")
         
 # ENTER_MY_OWN_DISCORD_BOT_TOKEN
-bot.run('ODMyNTcyNDY2MzU4Mzg2Njg5.YHlviA.3bR58BwDcjtOHoqsV5bxPrmWccY') #토큰
+bot.run('ODMyNTcyNDY2MzU4Mzg2Njg5.YHlviA.tL_Zz4BFjSQPzjlA-HHLZUQwlVQ') #토큰
