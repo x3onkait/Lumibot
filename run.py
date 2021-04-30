@@ -22,6 +22,7 @@ from resource.sub_function_used_globally.printCommandLog import printCommandLog 
 
 bot = commands.Bot(command_prefix="$")
 
+_DISCORD_BOT_TOKEN = input("enter your token > ")
 
 @bot.event
 async def on_ready():
@@ -445,4 +446,4 @@ async def on_command_error(ctx, error):
     	#await ctx.send("명령어를 찾지 못했습니다")
         
 # ENTER_MY_OWN_DISCORD_BOT_TOKEN
-bot.run('ODMyNTcyNDY2MzU4Mzg2Njg5.YHlviA.SClV8wb02qi-j7f9FM2Ofv8_ZHQ') #토큰
+bot.run(_DISCORD_BOT_TOKEN) #토큰
