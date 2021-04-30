@@ -17,7 +17,8 @@
 - show ~~ : 인사하기 / 도움말 / 봇 정보 / 이스터에그(?)
 - show population : 실시간 세계인구 통계
 - show currentTime : 현재 시간을 년/월/일/시(24hr)/분/초 단위로 보기
-- show gameStat --LOL --username [유저명] : 해당 유저명의 리그 오브 레전드 전적 보기(Solo Rank 위주)
+- show gameStat --LOL --username [유저명] : 해당 유저명의 리그 오브 레전드 전적 보기
+- show gameStat --LOLtft --username [유저명] : 해당 유저명의 리그 오브 레전드 전략전 팀 전투(롤토체스, TFT) 전적 보기
 - show stock --search [종목] : 국내 주식 종목 확인(다음 금융)
 - show crypto --brief : 전세계 암호화폐 시장 현환 요약 정리(시가총액이나 24h volume)
 - show crypto --search [암호화폐 심볼(ex. BTC/ETH)] : 암호화폐 시세 검색(빗썸)
