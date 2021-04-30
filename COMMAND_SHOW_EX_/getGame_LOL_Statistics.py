@@ -2,7 +2,7 @@ import urllib                   # 한글 요청이 포함될 때 오류 발생�
 
 import requests
 from bs4 import BeautifulSoup
-
+import time, datetime
 import sys, os
 
 import json
@@ -15,8 +15,6 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 # 로깅 처리 함수 불러오기
 from resource.sub_function_used_globally.printCommandLog import printCommandLog as printCommandLog
 ######################################################################################
-
-import time, datetime
 
 # GAMEPLAY_STATUS의 인덱스 명을 보다 쉽게 알아보기 위해 ENUM 클래스 선언
 from enum import Enum

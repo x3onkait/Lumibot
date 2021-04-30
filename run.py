@@ -180,6 +180,12 @@ async def show(ctx, *option):
 
             OVERALL_FUNCTION_RETURN, COMMON_USER_INFO, USER_GAMEPLAY_OVERALL_STAT, USER_GAMEPLAY_DETAILED_STATUS, running_time = COMMAND_SHOW_EX_.getGame_LOLtft_Statistics.getLOLtftUserStatistics(ctx.author.name, str(option[3]))
 
+            if OVERALL_FUNCTION_RETURN == -1:
+                embed = discord.Embed(title = "No Statistics Exists", description = "데이터 수집 중 NoneType을 포함할 수 있는 예외가 발견되었습니다.\n등록된 플레이 기록이 검색되지 않았습니다.\n혹시 게임을 하지 않으셨나요?", color = 0xff0000)
+                embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
+                await ctx.send(embed = embed)
+                printCommandLog(ctx.author.name, "show gameStat --LOLtft --username {}".format(str(option[3])), "FAILED", "NO_STATISTICS_EXISTS")
+
             if OVERALL_FUNCTION_RETURN == 408:
                 embed = discord.Embed(title = "No Response Exception", description = "현재 전적 조회소 poro.gg 에서 응답이 Timeout 내에 돌아오지 않고 있습니다.\n요청을 단기간에 과도하게 보내지 마시고, 잠시 후 다시 시도하세요.", color = 0xff0000)
                 embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
