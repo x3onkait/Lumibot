@@ -33,6 +33,14 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game(name="enter [$show help] to get info"))
     printCommandLog(bot.user.name, "START THE BOT", "OK")
 
+# 재미를 위한 이스터 에그 :)
+@bot.command()
+async def overdrive(ctx):
+    easterEgg = "**힘이... 어둠이... 넘쳐흐른다! 아↗하하하하하!!!!**"
+    await ctx.channel.send(easterEgg)
+    printCommandLog(ctx.author.name, "overdrive", "OK", "Easter Egg")
+
+
 # show [옵션1]
 @bot.command()
 async def show(ctx, *option):                   
@@ -48,6 +56,7 @@ async def show(ctx, *option):
                 '''
                 인사 : `show hello`, 도움말 : `show help`, 봇 정보 : `show info` 
                 현재 세계 인구 통계 : `show population`, 현재 시간 보기 : `show currentTime`
+                이스터에그(폭주!) : `overdrive`
 
                 리그 오브 레전드 게임 전적 조회(유저명 검색)```show gameStat --LOL --username [유저명]```
                 국내 주식 시세 검색(다음 금융 제공)```show stock --search [국내 주식 종목명(ex. 삼성전자)]```
@@ -436,4 +445,4 @@ async def on_command_error(ctx, error):
     	#await ctx.send("명령어를 찾지 못했습니다")
         
 # ENTER_MY_OWN_DISCORD_BOT_TOKEN
-bot.run('ODMyNTcyNDY2MzU4Mzg2Njg5.YHlviA.tL_Zz4BFjSQPzjlA-HHLZUQwlVQ') #토큰
+bot.run('ODMyNTcyNDY2MzU4Mzg2Njg5.YHlviA.SClV8wb02qi-j7f9FM2Ofv8_ZHQ') #토큰

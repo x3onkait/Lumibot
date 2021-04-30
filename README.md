@@ -10,9 +10,11 @@
 
 <hr/> 
 
+**`도움말 : $show help`**
+
 ###### 제공하는 기능들 > 명령어
 
-- show : 인사하기 / 도움말 /봇 정보
+- show ~~ : 인사하기 / 도움말 / 봇 정보 / 이스터에그(?)
 - show population : 실시간 세계인구 통계
 - show currentTime : 현재 시간을 년/월/일/시(24hr)/분/초 단위로 보기
 - show gameStat --LOL --username [유저명] : 해당 유저명의 리그 오브 레전드 전적 보기(Solo Rank 위주)
@@ -35,21 +37,24 @@
 
 ```
 We have loggedd in as Lumibot#1512
-[ 2021-04-26 02:11:29.171 ] >  COMMAND = START THE BOT                  STATUS = OK
+[ 2021-04-30 05:39:16.703 ] : @Lumibot -->  COMMAND = START THE BOT | STATUS = OK
 
-[ 2021-04-26 02:17:18.860 ] >  COMMAND = show crypto --brief(Function)  STATUS = RUNNING
- ┖ Getting Brief Information
+[ 2021-04-30 05:39:19.006 ] : @Luminous -->  COMMAND = show crypto --symbol BTC (Function) | STATUS = RUNNING
+ ┖ Getting Stock Information : BTC
 
-[ 2021-04-26 02:17:18.912 ] >  COMMAND = show crypto --brief(Function)  STATUS = RUNNING
- ┖ running time : 1.412 sec/pass
+[ 2021-04-30 05:39:19.008 ] : @Luminous -->  COMMAND = show crypto --symbol BTC (Function) | STATUS = RUNNING
+ ┖ RESULT > 비트코인 | 63,609,000 원 | 63,299,000 원 | 62,770,000 원 | 64,312,000 원 | ≈ 3,308.126 BTC | ≈ 210,450,009,424 원 | 277,000 원 | 0.44 % | 2021년 04월 30일 14시 39분 18.982초
 
-[ 2021-04-26 02:17:18.913 ] >  COMMAND = show crypto --brief            STATUS = RUNNING
+[ 2021-04-30 05:39:19.009 ] : @Luminous -->  COMMAND = show crypto --symbol BTC (Function) | STATUS = RUNNING
+ ┖ running time : 0.3001 sec/pass
+
+[ 2021-04-30 05:39:19.010 ] : @Luminous -->  COMMAND = show crypto --symbol BTC | STATUS = RUNNING
  ┖ INIT_GET_INFO_PHASE
 
-[ 2021-04-26 02:17:19.182 ] >  COMMAND = show crypto --brief            STATUS = RUNNING
+[ 2021-04-30 05:39:19.615 ] : @Luminous -->  COMMAND = show crypto --symbol BTC | STATUS = RUNNING
  ┖ FIN_GET_INFO_PHASE
 
-[ 2021-04-26 02:17:19.182 ] >  COMMAND = show crypto --brief            STATUS = OK
+[ 2021-04-30 05:39:19.617 ] : @Luminous -->  COMMAND = show crypto --symbol BTC | STATUS = OK
 ```
 
 <hr/>
