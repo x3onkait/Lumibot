@@ -7,11 +7,12 @@ import os #, sys
 
 ############################# 직접 만든 모듈 ##################################
 
-import COMMAND_SHOW_EX_.getCryptocurrencyInfo       # 암호화폐 정보
-import COMMAND_SHOW_EX_.getStockInfo                # 주식 정보
-import COMMAND_SHOW_EX_.getCurrentTime              # 현재 시간 정보
-import COMMAND_SHOW_EX_.getWorldPopulation          # 인구 정보
-import COMMAND_SHOW_EX_.getGame_LOL_Statistics           # 게임 전적 정보
+import COMMAND_SHOW_EX_.getCryptocurrencyInfo           # 암호화폐 정보
+import COMMAND_SHOW_EX_.getStockInfo                    # 주식 정보
+import COMMAND_SHOW_EX_.getCurrentTime                  # 현재 시간 정보
+import COMMAND_SHOW_EX_.getWorldPopulation              # 인구 정보
+import COMMAND_SHOW_EX_.getGame_LOL_Statistics          # 리그 오브 레전드 전적 정보
+import COMMAND_SHOW_EX_.getGame_LOLtft_Statistics       # 리그 오브 레전드 전략적 팀 전투(롤토체스) 전적 정보
 
 import COMMAND_RANDOM_.randomToolBox        # 난수 관련
 import COMMAND_CALCULATE_.calculator        # 계산기 역할을 하는 다양한 모듈들
@@ -59,7 +60,9 @@ async def show(ctx, *option):
                 현재 세계 인구 통계 : `show population`, 현재 시간 보기 : `show currentTime`
                 이스터에그(폭주!) : `overdrive`
 
-                리그 오브 레전드 게임 전적 조회(유저명 검색)```show gameStat --LOL --username [유저명]```
+                온라인 게임 전적 조회(유저명 검색)
+                게임 옵션) 리그 오브 레전드(`--LOL`), 롤토체스(`--LOLtft`)
+                ```show gameStat [게임 옵션] --username [유저명]```
                 국내 주식 시세 검색(다음 금융 제공)```show stock --search [국내 주식 종목명(ex. 삼성전자)]```
                 암호화폐 시세 검색(빗썸 제공)```show crypto --symbol [암호화폐 기호(ex. BTC)]```
                 암호화폐 통계 요약(전세계/코인랭킹 제공)```show crypto --brief```
@@ -118,24 +121,28 @@ async def show(ctx, *option):
             embed.set_thumbnail(url = COMMON_USER_INFO[2])
 
             embed.set_author(name = " : @{}".format(COMMON_USER_INFO[1]), url = USERSOLORANK_INFO[0], icon_url = USERSOLORANK_INFO[0])
+
             embed.add_field(name = "기본 정보", value = 
             '''
             랭킹 현황 : **{}**
-            유저 이름 : **{}**
+            __유저 이름 : **{}**__
             유저 레벨 : **{}**
             '''.format(COMMON_USER_INFO[0], COMMON_USER_INFO[1], COMMON_USER_INFO[3]), inline = False)
+
             embed.add_field(name = "솔로 랭크 통계", value = 
             '''
             __랭크 : **{}**__
             리그 포인트 : **{}**
             승률 : **{}** {}
             '''.format(USERSOLORANK_INFO[1], USERSOLORANK_INFO[2], USERSOLORANK_INFO[3], USERSOLORANK_INFO[4]), inline = True)
+
             embed.add_field(name = "자유 랭크 통계", value = 
             '''
             랭크 : **{}**
             리그 포인트 : **{}**
             승률 : **{}** {}
             '''.format(USERFREERANK_INFO[1], USERFREERANK_INFO[2], USERFREERANK_INFO[3], USERFREERANK_INFO[4]), inline = True)
+
             embed.add_field(name = "최근 게임 플레이 분석", value = 
             '''
             최근 플레이한 게임 : **{}**
@@ -155,7 +162,7 @@ async def show(ctx, *option):
                         GAMEPLAY_STATUS[10], GAMEPLAY_STATUS[11], GAMEPLAY_STATUS[12]), inline = False)
             # embed.set_image(url = "https://i.imgur.com/GClp1fh.png")
 
-            embed.set_footer(text="Lumibot | From {}({}) | Run Time : {} sec | 전적의 모든 랭킹 관련 결과는 솔로 랭크 자료입니다.".format(ctx.message.author.name, ctx.author.display_name, running_time), icon_url = ctx.author.avatar_url)
+            embed.set_footer(text="Lumibot | From {}({}) | Run Time : {} sec".format(ctx.message.author.name, ctx.author.display_name, running_time), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
 
             printCommandLog(ctx.author.name, "show gameStat --LOL --username {}".format(str(option[3])), "RUNNING", "FIN_GET_INFO_PHASE")   
@@ -166,6 +173,62 @@ async def show(ctx, *option):
             embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
             await ctx.send(embed = embed)
             printCommandLog(ctx.author.name, "show gameStat --LOL --username {}".format(str(option[3])), "FAILED", "ILLEGAL_ARGUMENT_DETECTED")   
+
+    elif option[0] == "gameStat" and option[1] == "--LOLtft" and option[2] == "--username":
+
+        if len(option) == 4:
+
+            OVERALL_FUNCTION_RETURN, COMMON_USER_INFO, USER_GAMEPLAY_OVERALL_STAT, USER_GAMEPLAY_DETAILED_STATUS, running_time = COMMAND_SHOW_EX_.getGame_LOLtft_Statistics.getLOLtftUserStatistics(ctx.author.name, str(option[3]))
+
+            if OVERALL_FUNCTION_RETURN == 408:
+                embed = discord.Embed(title = "No Response Exception", description = "현재 전적 조회소 poro.gg 에서 응답이 Timeout 내에 돌아오지 않고 있습니다.\n요청을 단기간에 과도하게 보내지 마시고, 잠시 후 다시 시도하세요.", color = 0xff0000)
+                embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
+                await ctx.send(embed = embed)
+                printCommandLog(ctx.author.name, "show gameStat --LOLtft --username {}".format(str(option[3])), "FAILED", "NO_RESPONSE_RETURNED")
+
+            elif OVERALL_FUNCTION_RETURN == 404:
+                embed = discord.Embed(title = "No Expected Data Received", description = "제대로 된 데이터가 poro.gg에서 오지 않았습니다\n오타가 입력되었을 가능성이 매우 높으니 입력값을 다시 한번 확인해주세요.", color = 0xff0000)
+                embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
+                await ctx.send(embed = embed)
+                printCommandLog(ctx.author.name, "show gameStat --LOLtft --username {}".format(str(option[3])), "FAILED", "NO_EXPECTED_DATA_RECEIVED")
+
+            printCommandLog(ctx.author.name, "show gameStat --LOLtft --username {}".format(str(option[3])), "RUNNING", "INIT_GET_INFO_PHASE")
+
+            embed = discord.Embed(title = "리그 오브 레전드 전적 조회", description = "정보 제공 : poro.gg", timestamp=datetime.datetime.utcnow(), color = 0x8e6b92)
+
+            embed.set_thumbnail(url = COMMON_USER_INFO[2])
+
+            embed.add_field(name = "기본 정보", value = 
+            '''
+            __유저 이름 : **{}**__
+            유저 레벨 : **{}**
+            __랭크 : **{} ( {} )**__
+            전체 유저 순위 : **{}**
+            리그 포인트 : **{}**
+            '''.format(COMMON_USER_INFO[0], COMMON_USER_INFO[1], USER_GAMEPLAY_OVERALL_STAT[0], USER_GAMEPLAY_OVERALL_STAT[2],
+            USER_GAMEPLAY_OVERALL_STAT[3], USER_GAMEPLAY_OVERALL_STAT[1]), inline = False)
+
+            embed.add_field(name = "게임플레이 세부 통계", value = 
+            '''
+            승리 : **{}** ( 상위 {} )
+            승률 : **{}** ( 상위 {} )
+            게임 플레이 수 : **{}** ( 상위 {} )
+            평균 게임 등수 : **{}**
+            '''.format(USER_GAMEPLAY_DETAILED_STATUS[0], USER_GAMEPLAY_DETAILED_STATUS[1], USER_GAMEPLAY_DETAILED_STATUS[2], USER_GAMEPLAY_DETAILED_STATUS[3],
+                    USER_GAMEPLAY_DETAILED_STATUS[4], USER_GAMEPLAY_DETAILED_STATUS[5], USER_GAMEPLAY_DETAILED_STATUS[6]), inline = False)
+            
+            embed.set_footer(text="Lumibot | From {}({}) | Run Time : {} sec".format(ctx.message.author.name, ctx.author.display_name, running_time), icon_url = ctx.author.avatar_url)
+            await ctx.send(embed = embed)
+
+            printCommandLog(ctx.author.name, "show gameStat --LOLtft --username {}".format(str(option[3])), "RUNNING", "FIN_GET_INFO_PHASE")   
+            printCommandLog(ctx.author.name, "show gameStat --LOLtft --username {}".format(str(option[3])), "OK")
+
+        else:
+            embed = discord.Embed(title = "Illegal Argument", description = "제대로 지원되는 입력 형식이 아닙니다.",  timestamp=datetime.datetime.utcnow(),  color = 0xff0000)
+            embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
+            await ctx.send(embed = embed)
+            printCommandLog(ctx.author.name, "show gameStat --LOLtft --username {}".format(str(option[3])), "FAILED", "ILLEGAL_ARGUMENT_DETECTED")  
+
 
     elif option[0] == "crypto" and option[1] == "--symbol":
 

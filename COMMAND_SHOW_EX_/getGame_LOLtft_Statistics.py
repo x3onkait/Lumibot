@@ -43,8 +43,9 @@ def getLOLtftUserStatistics(fromWho, username):
             return 404
 
         # 유저 기본 정보
-        # 유저 이름
-        USERNAME = soup.select_one('#profile > div > div.profile__header > div.profile__summoner > span').get_text().split()[0]
+        # 유저 이름 > 띄어쓰기를 통한 공백이 이름 안에 있는 경우 문제 발생
+        # USERNAME = soup.select_one('#profile > div > div.profile__header > div.profile__summoner > span').get_text().split()[0]
+        USERNAME = username
 
         # 유저 레벨
         USERLEVEL = soup.select_one('#profile > div > div.profile__header > div.profile__icon > span').get_text()
@@ -55,7 +56,7 @@ def getLOLtftUserStatistics(fromWho, username):
         USER_PROFILE_PICTURE = "http:" + USER_PROFILE_PICTURE
 
         COMMON_USER_INFO = [USERNAME, USERLEVEL, USER_PROFILE_PICTURE]
-        print(COMMON_USER_INFO)
+        # print(COMMON_USER_INFO)
 
         # 유저 게임플레이 관련 정보
         # 순서대로 티어 이름, LP(League Point), 상위 퍼센트, 그리고 전체 등수
@@ -67,9 +68,32 @@ def getLOLtftUserStatistics(fromWho, username):
         USER_TOP_PERCENT = "{} {}".format(USER_TIER_INFO_MIX[5], USER_TIER_INFO_MIX[6])
 
         USER_GAMEPLAY_OVERALL_STAT = [USER_TIER_NAME, USER_LEAGUE_POINT, USER_TOP_PERCENT, USER_RANKING_STEP]
-        print(USER_GAMEPLAY_OVERALL_STAT)
+        # print(USER_GAMEPLAY_OVERALL_STAT)
 
-        
+        # 유저 게임 세부 통계 관련 정보
+        # 순서대로 이긴 게임 수와 그에 대한 상위 % 비율 / 평균 승률과 그에 대한 상위 % 비율
+        # 게임 플레이 수와 그에 대한 상위 % 비율 / 평균 게임 등수(1 ~ 8등)
+        USER_GAMEPLAY_VICTORY = soup.select_one('#profile > div > div:nth-child(2) > div.row.row-normal.mt-3 > div.col-lg-4 > div.profile__tier > div.profile__tier__stats > div > div.col-6.profile__tier__wins > div.profile__tier__stat.clearfix > span.profile__tier__stat__value.float-right').get_text().strip()
+        USER_GAMEPALY_VICTORY_TOP_PERCENT = soup.select_one('#profile > div > div:nth-child(2) > div.row.row-normal.mt-3 > div.col-lg-4 > div.profile__tier > div.profile__tier__stats > div > div.col-6.profile__tier__wins > span').get_text().split()[1]
+        USER_GAMEPLAY_WINNING_RATE = soup.select_one('#profile > div > div:nth-child(2) > div.row.row-normal.mt-3 > div.col-lg-4 > div.profile__tier > div.profile__tier__stats > div > div.col-6.profile__tier__winrate_10 > div.profile__tier__stat.clearfix > span.profile__tier__stat__value.float-right').get_text().strip()
+        USER_GAMEPLAY_VICTORY_TOP_PERCENT = soup.select_one('#profile > div > div:nth-child(2) > div.row.row-normal.mt-3 > div.col-lg-4 > div.profile__tier > div.profile__tier__stats > div > div.col-6.profile__tier__winrate_10 > span').get_text().split()[1]
+        USER_GAMEPLAY_GAME_COUNT = soup.select_one('#profile > div > div:nth-child(2) > div.row.row-normal.mt-3 > div.col-lg-4 > div.profile__tier > div.profile__tier__stats > div > div.col-6.profile__tier__plays > div.profile__tier__stat.clearfix > span.profile__tier__stat__value.float-right').get_text().strip()
+        USER_GAMEPLAY_GAME_COUNT_TOP_PERCENT = soup.select_one('#profile > div > div:nth-child(2) > div.row.row-normal.mt-3 > div.col-lg-4 > div.profile__tier > div.profile__tier__stats > div > div.col-6.profile__tier__plays > span').get_text().split()[1]
+        USER_GAMEPLAY_AVERAGE_GRADE = soup.select_one('#profile > div > div:nth-child(2) > div.row.row-normal.mt-3 > div.col-lg-4 > div.profile__tier > div.profile__tier__stats > div > div.col-6.profile__tier__avg_rank > div.profile__tier__stat.clearfix > span.profile__tier__stat__value.float-right').get_text().strip()
+
+        USER_GAMEPLAY_DETAILED_STATUS = [USER_GAMEPLAY_VICTORY, USER_GAMEPALY_VICTORY_TOP_PERCENT, USER_GAMEPLAY_WINNING_RATE,
+                                        USER_GAMEPLAY_VICTORY_TOP_PERCENT, USER_GAMEPLAY_GAME_COUNT, USER_GAMEPLAY_GAME_COUNT_TOP_PERCENT,
+                                        USER_GAMEPLAY_AVERAGE_GRADE]
+
+        # print(USER_GAMEPLAY_DETAILED_STATUS)
+
+        OVERALL_FUNCTION_RETURN = 200
+
+    _END_TIME = time.time()
+    running_time = round((_END_TIME - _START_TIME), 4)
+    printCommandLog(fromWho, "show gameStat --LOLtft --username {}(Function)".format(username), "RUNNING", "running time : " + str(running_time) + " sec/pass")
+
+    return OVERALL_FUNCTION_RETURN, COMMON_USER_INFO, USER_GAMEPLAY_OVERALL_STAT, USER_GAMEPLAY_DETAILED_STATUS, running_time
 
 
-getLOLtftUserStatistics("EXAMPLE123", "6L3gap")
+# print(getLOLtftUserStatistics("EXAMPLE123", "T1 Bebe872"))
