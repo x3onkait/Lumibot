@@ -1,44 +1,31 @@
+def calculator(userInput):
 
-# 덧셈
-def addition(x, y):
-    return x + y
+    
+    calcInput = list(userInput)
+    # print(calcInput)
 
-# 뺄샘
-def subtraction(x, y):
-    return x - y
+    # 필터링 리스트 
+    allowList = ['+', '-', '*', '/', '**', '%', '&', '|', '^', '(', ')', '.']
 
+    # 입력값 검증!
+    try:
+        for sequence in range(0, len(calcInput) - 1):
+            if calcInput[sequence] in allowList or isNumber(calcInput[sequence]) == True:
+                pass
+            else:
+                return "FILTERED"
+            
+        calcInput = ' '.join(calcInput)
+        return eval(calcInput)
+    except:
+        return "WRONG EXPRESSION"
 
-# 곱셈
-def multiplication(x, y):
-    return x * y
- 
+def isNumber(trial):            # 숫자(정수, 실수인지 판단하기)
+    try:
+        float(trial)
+        return True             # num을 float으로 변환할 수 있는 경우
+    except ValueError:          # num을 float으로 변환할 수 없는 경우
+        return False
 
-# 나눗셈
-def division(x, y):
-    return x / y
- 
-
-# 거듭제곱
-def power(x, y):
-    return x ** y
- 
-
-# 나머지(모듈러)
-def modular(x, y):
-    return x % y
- 
-
-# 비트 AND 연산
-def bitAND(x, y):
-    return x & y
- 
-
-# 비트 OR 연산
-def bitOR(x, y):
-    return x | y
- 
-
-# 비트 XOR 연산
-def bitXOR(x, y):
-    return x ^ y
- 
+# userInput = input("insert the expression > ")
+# print(calculator(('2.1', '+', '3')))

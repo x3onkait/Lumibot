@@ -73,7 +73,8 @@ async def show(ctx, *option):
                 ''', inline = False)
         embed.add_field(name = "```calculate``` 계열 명령어", value = 
                 '''
-                간단한 수식 계산(사칙연산/나머지/비트논리연산)```calculate [숫자] [+|-|*|/|**(거듭제곱)|%(나머지)|&,AND,and||,OR,or|^,XOR,xor] [숫자]```
+                간단한 수식 계산(사칙연산/나머지/비트논리연산)```calculate [숫자] [연산자] [숫자] ...```
+                지원되는 연산자 `+|-|*|/|**(거듭제곱)|%(나머지)|&(비트and)||(비트or)|^(비트xor)`, 지원되는 숫자 `정수, 실수`
                 ''', inline = False)
         embed.add_field(name = "```random``` 계열 명령어", value = 
                 '''
@@ -411,37 +412,31 @@ async def echo(ctx, *option):       # option이란 tuple 자료형이 메시지�
 @bot.command()
 async def calculate(ctx, *option):
     embed = discord.Embed(title = "Calculate the expression", description = "계산 수행",  timestamp=datetime.datetime.utcnow(), color = 0xffcbd2)
-    if len(option) == 3:
-        if option[1] == "+":
-            calcResult = COMMAND_CALCULATE_.calculator.addition(int(option[0]), int(option[2]))
-        elif option[1] == "-":
-            calcResult = COMMAND_CALCULATE_.calculator.subtraction(int(option[0]), int(option[2]))
-        elif option[1] == "*":
-            calcResult = COMMAND_CALCULATE_.calculator.multiplication(int(option[0]), int(option[2]))
-        elif option[1] == "/":
-            calcResult = COMMAND_CALCULATE_.calculator.division(int(option[0]), int(option[2]))
-        elif option[1] == "**":
-            calcResult = COMMAND_CALCULATE_.calculator.power(int(option[0]), int(option[2]))
-        elif option[1] == "%":
-            calcResult = COMMAND_CALCULATE_.calculator.modular(int(option[0]), int(option[2]))
-        elif option[1] == "&" or option[1] == "AND" or option[1] == "and":
-            calcResult = COMMAND_CALCULATE_.calculator.bitAND(int(option[0]), int(option[2]))
-        elif option[1] == "|" or option[1] == "OR" or option[1] == "or":
-            calcResult = COMMAND_CALCULATE_.calculator.bitOR(int(option[0]), int(option[2]))
-        elif option[1] == "^" or option[1] == "XOR" or option[1] == "xor":
-            calcResult = COMMAND_CALCULATE_.calculator.bitXOR(int(option[0]), int(option[2]))
-        else:
-            embed.add_field(name = "Exception Occured", value = "값을 점검해주세요.", inline = False)
-            printCommandLog(ctx.author.name, "calculate {} {} {}".format(str(option[0]), str(option[1]), str(option[2])), "FAILED", "EXCEPTION_OCCURED")
-        embed.add_field(name = option[0] + " " + option[1] + " " + option[2] + " " + "= ", value = calcResult, inline = False)
+    if len(option) > 1 and len(option) % 2 == 1:
+        calcResult = COMMAND_CALCULATE_.calculator.calculator(option)
+        # 에러 처리
+        if calcResult in ['FILTERED', 'WRONG EXPRESSION']:
+            embed = discord.Embed(title = "Argument Exception", description = '''
+            입력값 형식이 올바르지 않습니다\n
+            [입력값] [연산자] [입력값] ... 형식의 일반적인 형식을 지원하고 있습니다\n
+            지원되는 연산자는 +, -, *, /, **, %, &, |, ^ 입니다.
+            상세 에러 코드 : {}
+            '''.format(calcResult),  timestamp=datetime.datetime.utcnow(), color = 0xff0000)
+            await ctx.send(embed = embed)
+            printCommandLog(ctx.author.name, "calculate {}".format(option), "FAILED", "ERROR_OR_EXCEPTION_OCCURED... {}".format(calcResult))
+        # 리스트의 형식이 아닌 실제 문자열의 형식으로 유저 input을 구체화
+        actualUserInput = str(option).replace('\'','').replace(',','').replace(')','').replace('(','')
+        embed.add_field(name = "calculate {}".format(actualUserInput), value = calcResult, inline = False)
         embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
         await ctx.send(embed = embed)
-        printCommandLog(ctx.author.name, "calculate {} {} {}".format(str(option[0]), str(option[1]), str(option[2])), "OK")
+        printCommandLog(ctx.author.name, "calculate {} = {}".format(actualUserInput, calcResult), "OK")
     else:
-        embed = discord.Embed(title = "Argument Overflow", description = "입력값이 너무 많거나 적습니다. | 형식 : [숫자1] [연산자] [숫자2]",  timestamp=datetime.datetime.utcnow(), color = 0xff0000)
-        embed.set_footer(text="Lumibot | From {}({})".format(ctx.message.author.name, ctx.author.display_name), icon_url = ctx.author.avatar_url)
+        embed = discord.Embed(title = "Argument Exception", description = '''
+        입력값 형식이 올바르지 않습니다\n
+        [입력값] [연산자] [입력값] 처럼 2n - 1 개의 입력값이 들어거야 합니다.
+        ''',  timestamp=datetime.datetime.utcnow(), color = 0xff0000)
         await ctx.send(embed = embed)
-        printCommandLog(ctx.author.name, "calculate {}".format(option), "FAILED", "TOO_MUCH_LESS_ARGUMENT")
+        printCommandLog(ctx.author.name, "calculate {}".format(option), "FAILED", "TO_LESS_ARGUMENT")
 
 @bot.command()
 async def random(ctx, *option):
